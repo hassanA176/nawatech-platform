@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}مكتب المستشار{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark"><i class="fas fa-crown text-warning me-2"></i> لوحة المستشار</h2>
+        <a href="{{ url_for('dashboard.settings') }}" class="btn btn-outline-dark"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <!-- طلبات التمويل من المستثمرين -->
+    {% if funding_requests %}
+    <div class="alert bg-white border border-success border-2 shadow-sm mb-5 p-4">
+        <h4 class="fw-bold text-success mb-4"><i class="fas fa-hand-holding-usd me-2"></i> طلبات التمويل الجديدة من المستثمرين</h4>
+        <div class="row g-3">
+            {% for req in funding_requests %}
+            <div class="col-12">
+                <div class="bg-light p-4 rounded-3 border-start border-success border-4">
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                        <span class="fw-bold text-dark fs-5"><i class="fas fa-building text-muted me-2"></i> المشروع: {{ req.application.startup.name }}</span>
+                        <span class="text-muted small">{{ req.created_at.strftime('%Y-%m-%d') }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="badge bg-success mb-2 fs-6"><i class="fas fa-user-tie me-1"></i> المستثمر: {{ req.investor.full_name }}</span>
+                        <p class="mb-0 text-dark fs-5 mt-2">{{ req.message }}</p>
+                    </div>
+                    <button class="btn btn-outline-success fw-bold"><i class="fas fa-reply me-1"></i> التواصل مع المستثمر</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- نافذة الأفكار الـ VIP -->
+    <h4 class="fw-bold text-danger mb-3"><i class="fas fa-fire me-2"></i> الأفكار ذات الأهمية العالية (VIP)</h4>
+    <div class="row mb-5">
+        {% if ideas %}
+            {% for idea in ideas %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm h-100 border-top border-danger border-4">
+                    <div class="card-body">
+                        <span class="badge bg-danger mb-2">مرشحة من المدرب: {{ idea.trainer.full_name }}</span>
+                        <h5 class="fw-bold text-primary">{{ idea.startup.name }}</h5>
+                        <p class="text-muted small"><i class="fas fa-map-marker-alt me-1"></i> {{ idea.startup.city }}</p>
+                        <p class="small text-dark fw-bold bg-light p-2 rounded">{{ idea.startup.summary[:100] }}...</p>
+                        <a href="{{ url_for('advisor.project_details', app_id=idea.id) }}" 
+                           class="btn btn-outline-danger w-100 fw-bold btn-sm mt-2">
+                            <i class="fas fa-eye me-1"></i> عرض كافة تفاصيل المشروع
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-4 bg-white rounded shadow-sm">
+                <p class="text-muted fw-bold mb-0">لم يقم المدربون بتصنيف أي أفكار كـ VIP حتى الآن.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- المشاريع المخصصة (المرسلة من المدربين إليك) -->
+    {% if shared_projects %}
+    <h4 class="fw-bold text-success mt-5 mb-3"><i class="fas fa-share-alt me-2"></i> مشاريع مرسلة إليك مباشرة من المدربين</h4>
+    <div class="row mb-5 g-4">
+        {% for shared in shared_projects %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100 border-top border-success border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="badge bg-success">مرسل من: {{ shared.trainer.full_name }}</span>
+                        <span class="text-muted small">{{ shared.created_at.strftime('%Y-%m-%d') }}</span>
+                    </div>
+                    <h5 class="fw-bold text-primary mt-2">{{ shared.application.startup.name }}</h5>
+                    <p class="text-muted small"><i class="fas fa-map-marker-alt me-1"></i> {{ shared.application.startup.city }}</p>
+                    <p class="small text-dark fw-bold bg-light p-2 rounded">{{ shared.application.startup.summary[:100] }}...</p>
+                    <a href="{{ url_for('advisor.project_details', app_id=shared.application.id) }}" 
+                       class="btn btn-outline-success w-100 fw-bold btn-sm mt-2">
+                        <i class="fas fa-microscope me-1"></i> فحص المشروع بالكامل
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- قائمة المدربين وإرسال الطلبات -->
+    <h4 class="fw-bold text-primary mb-3"><i class="fas fa-chalkboard-teacher me-2"></i> قائمة المدربين المعتمدين</h4>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="py-3 px-4">اسم المدرب</th>
+                            <th class="py-3">المدينة</th>
+                            <th class="py-3 text-end px-4">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trainer in trainers %}
+                        <tr>
+                            <td class="fw-bold px-4"><i class="fas fa-user-tie text-muted me-2"></i> {{ trainer.full_name }}</td>
+                            <td>{{ trainer.city }}</td>
+                            <td class="text-end px-4">
+                                <button class="btn btn-primary btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#msgModal{{ trainer.id }}">
+                                    <i class="fas fa-paper-plane me-1"></i> إرسال طلب/توجيه
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Modal إرسال رسالة للمدرب -->
+                        <div class="modal fade" id="msgModal{{ trainer.id }}" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow">
+                                    <div class="modal-header bg-primary text-white">
+                                        <h5 class="modal-title fw-bold">إرسال طلب للمدرب: {{ trainer.full_name }}</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="POST" action="{{ url_for('advisor.send_request') }}">
+                                        <div class="modal-body p-4">
+                                            <input type="hidden" name="trainer_id" value="{{ trainer.id }}">
+                                            <label class="fw-bold mb-2">محتوى الطلب (مثال: أرسل لي أفضل 3 أفكار لديك):</label>
+                                            <textarea name="content" class="form-control" rows="4" required></textarea>
+                                        </div>
+                                        <div class="modal-footer bg-light">
+                                            <button type="submit" class="btn btn-primary fw-bold w-100">إرسال</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

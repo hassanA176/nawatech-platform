@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}لوحة رائد الأعمال - نواتك{% endblock %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-12">
+            <!-- Welcome Banner -->
+            <div class="card bg-gradient-primary text-white border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="mb-2 fw-bold text-dark">مرحباً {{ current_user.full_name.split()[0] }}! 🚀</h2>
+                    <p class="mb-0 fs-5 text-dark">تابع رحلتك الريادية وحالة فكرتك من هنا.</p>
+                </div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="row mb-5 g-3">
+                <div class="col-12 col-md-4">
+                    <div class="card border-0 shadow-sm h-100" style="background-color: #f8f9fa; border-right: 5px solid #0d6efd !important;">
+                        <div class="card-body text-center py-4">
+                            <i class="fas fa-paper-plane fa-3x text-primary mb-3"></i>
+                            <h2 class="fw-bold text-dark display-5 mb-1">{{ stats.applications_count }}</h2>
+                            <p class="text-dark mb-0 fw-bold fs-5">إجمالي الطلبات المقدمة</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card border-0 shadow-sm h-100" style="background-color: #fdfbf7; border-right: 5px solid #ffc107 !important;">
+                        <div class="card-body text-center py-4">
+                            <i class="fas fa-lightbulb fa-3x text-warning mb-3"></i>
+                            <h2 class="fw-bold text-dark display-5 mb-1">{{ stats.startups_count }}</h2>
+                            <p class="text-dark mb-0 fw-bold fs-5">أفكار مسجلة</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card border-0 shadow-sm h-100" style="background-color: #f6fbf7; border-right: 5px solid #198754 !important;">
+                        <div class="card-body text-center py-4">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h2 class="fw-bold text-dark display-5 mb-1">{{ stats.accepted_count }}</h2>
+                            <p class="text-dark mb-0 fw-bold fs-5">طلبات مقبولة</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Ideas (Applications Status) -->
+            {% if my_applications %}
+            <div class="card shadow-sm border-0 mb-5">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h4 class="mb-0 fw-bold text-primary"><i class="fas fa-list-check me-2"></i>حالة الأفكار المقدمة</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        {% for app in my_applications %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card border border-2 h-100 {{ 'border-success' if app.status == 'accepted' else 'border-warning' }}">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <h5 class="fw-bold text-dark mb-0">{{ app.startup.name }}</h5>
+                                        {% if app.status == 'submitted' %}
+                                            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill"><i class="fas fa-clock me-1"></i> قيد المراجعة</span>
+                                        {% elif app.status == 'accepted' %}
+                                            <span class="badge bg-success px-3 py-2 rounded-pill"><i class="fas fa-check-circle me-1"></i> مقبولة</span>
+                                        {% elif app.status == 'rejected' %}
+                                            <span class="badge bg-danger px-3 py-2 rounded-pill"><i class="fas fa-times-circle me-1"></i> مرفوضة</span>
+                                        {% endif %}
+                                    </div>
+                                    <span class="badge bg-light text-dark border mb-3 align-self-start">{{ app.program.name }}</span>
+                                    
+                                    {% if app.status == 'accepted' %}
+                                        <div class="mb-4">
+                                            <small class="text-muted fw-bold mb-1 d-block">مستوى التقدم ({{ app.progress_percent }}%)</small>
+                                            <div class="progress" style="height: 10px; border-radius: 10px;">
+                                                <div class="progress-bar bg-success" style="width: {{ app.progress_percent }}%;"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- الأزرار الثلاثة + زر الشهادة إذا تخرج -->
+                                        <div class="mt-auto d-grid gap-2">
+                                            <a href="{{ url_for('dashboard.learning_hub', app_id=app.id) }}" class="btn btn-success fw-bold shadow-sm">
+                                                <i class="fas fa-play-circle me-1"></i> مسار التعلم والتخرج
+                                            </a>
+                                            <a href="{{ url_for('dashboard.mentoring', app_id=app.id) }}" class="btn btn-info fw-bold text-dark shadow-sm">
+                                                <i class="fas fa-video me-1"></i> الإرشاد الرقمي (Live)
+                                            </a>
+                                            <a href="{{ url_for('dashboard.library') }}" class="btn btn-primary fw-bold shadow-sm">
+                                                <i class="fas fa-book-reader me-1"></i> المكتبة الرقمية
+                                            </a>
+                                            
+                                            {% if app.is_graduated %}
+                                            <a href="{{ url_for('dashboard.view_certificate', app_id=app.id) }}" class="btn btn-warning btn-lg w-100 fw-bold mt-2 shadow-sm text-dark">
+                                                <i class="fas fa-award me-2"></i> عرض شهادة التخرج
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <p class="text-muted small mb-4 flex-grow-1">{{ (app.startup.summary or '')[:100] }}...</p>
+                                        <button class="btn btn-warning w-100 fw-bold text-dark disabled mb-2">في انتظار تقييم المدرب</button>
+                                        <a href="{{ url_for('dashboard.startup_detail', startup_id=app.startup.id) }}" class="btn btn-outline-primary btn-sm w-100">عرض التفاصيل</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Available Programs (تختفي إذا قدم على برنامج) -->
+            {% if not my_applications %}
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h4 class="mb-0 fw-bold text-success"><i class="fas fa-graduation-cap me-2"></i>البرامج المتاحة للتقديم</h4>
+                </div>
+                <div class="card-body p-4">
+                    {% if programs %}
+                    <div class="row g-4">
+                        {% for program in programs %}
+                        <div class="col-lg-4 col-md-6">
+                            <div class="card h-100 p-4 border rounded-3 bg-light hover-lift">
+                                <span class="badge bg-primary px-3 py-2 rounded-pill mb-3 align-self-start">{{ program.type or 'برنامج' }}</span>
+                                <h5 class="fw-bold text-dark mb-2">{{ program.name }}</h5>
+                                <p class="text-muted small mb-4"><i class="fas fa-map-marker-alt me-1"></i>{{ program.city or 'أونلاين' }}</p>
+                                <a href="{{ url_for('dashboard.apply_program', program_id=program.id) }}" class="btn btn-primary w-100 py-2 fw-bold mt-auto shadow-sm">قدم فكرتك هنا</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5"><h6 class="text-muted fw-bold mb-0">لا توجد برامج متاحة للتقديم في الوقت الحالي</h6></div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+<style>
+    .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
+</style>
+{% endblock %}

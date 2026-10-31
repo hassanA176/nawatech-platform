@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}إدارة الخدمات - لوحة الإدارة{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">
+            <i class="fas fa-briefcase text-primary me-2"></i>
+            إدارة باقات الخدمات
+        </h2>
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>العودة للوحة الإدارة
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <!-- إضافة باقة جديدة -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-plus me-2"></i>إضافة باقة جديدة</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="add_new" value="1">
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">عنوان الباقة</label>
+                            <input type="text" name="new_title" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">الوصف</label>
+                            <textarea name="new_description" class="form-control" rows="4" required></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-success">السعر</label>
+                                <input type="text" name="new_price" class="form-control" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold">العملة</label>
+                                <select name="new_currency" class="form-select" required>
+                                    <option value="MYR">رنجت</option>
+                                    <option value="USD">دولار</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3 mt-3">
+                            <label class="form-label">نص الزر</label>
+                            <input type="text" name="new_button_text" class="form-control" value="اشترِ الآن" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">أيقونة</label>
+                            <input type="text" name="new_icon" class="form-control" value="fas fa-star">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-plus me-2"></i>إضافة الباقة
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- تعديل الباقات الموجودة -->
+        <div class="col-lg-8">
+            <div class="row g-3">
+                {% for service in services %}
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <form method="POST" class="row g-3 align-items-end">
+                                <input type="hidden" name="service_id" value="{{ service.id }}">
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">العنوان</label>
+                                    <input type="text" name="title" class="form-control" value="{{ service.title }}" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold text-success">السعر</label>
+                                    <input type="text" name="price" class="form-control" value="{{ service.price }}" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold">العملة</label>
+                                    <select name="currency" class="form-select" required>
+                                        <option value="MYR" {{ 'selected' if service.currency == 'MYR' else '' }}>رنجت</option>
+                                        <option value="USD" {{ 'selected' if service.currency == 'USD' else '' }}>دولار</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">نص الزر</label>
+                                    <input type="text" name="button_text" class="form-control" value="{{ service.button_text }}" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">الوصف</label>
+                                    <textarea name="description" class="form-control" rows="2" required>{{ service.description }}</textarea>
+                                </div>
+                                <div class="col-12 text-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>حفظ التعديلات
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}تفاصيل الاستثمار{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark"><i class="fas fa-chart-pie text-success me-2"></i> التفاصيل الاستثمارية للمشروع</h2>
+        <a href="{{ url_for('investor.portal') }}" class="btn btn-outline-secondary fw-bold">العودة للبوابة</a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <!-- تفاصيل المشروع -->
+            <div class="card border-0 shadow-sm mb-4 border-top border-primary border-4">
+                <div class="card-body p-4">
+                    <h3 class="fw-bold text-primary mb-3">{{ app.startup.name }}</h3>
+                    <p class="fs-5 text-dark bg-light p-3 rounded lh-lg">{{ app.startup.summary }}</p>
+                    
+                    <h5 class="fw-bold text-danger mt-4">المشكلة التي يحلها:</h5>
+                    <p class="text-dark">{{ app.startup.problem }}</p>
+                    
+                    <h5 class="fw-bold text-success mt-4">الحل المبتكر:</h5>
+                    <p class="text-dark">{{ app.startup.solution }}</p>
+                </div>
+            </div>
+
+            <!-- مصفوفة المخاطر -->
+            <div class="card border-0 shadow-sm border-top border-warning border-4">
+                <div class="card-header bg-white py-3"><h5 class="fw-bold mb-0">مصفوفة المخاطر (محللة بواسطة الذكاء الاصطناعي)</h5></div>
+                <div class="card-body table-responsive">
+                    {{ app.startup.evaluation.risk_matrix | safe }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- تقييم الذكاء الاصطناعي -->
+            <div class="card border-0 shadow-sm mb-4 bg-dark text-white">
+                <div class="card-body text-center py-4">
+                    <h5 class="mb-3">ثقة الذكاء الاصطناعي بنجاح الفكرة</h5>
+                    {% set score = app.startup.evaluation.total_score %}
+                    {% if score >= 80 %}
+                        <h2 class="text-success fw-bold"><i class="fas fa-shield-alt me-2"></i> High Confidence</h2>
+                        <p class="mb-0 text-light">استثمار آمن وواعد</p>
+                    {% elif score >= 50 %}
+                        <h2 class="text-warning fw-bold"><i class="fas fa-balance-scale me-2"></i> Medium Confidence</h2>
+                        <p class="mb-0 text-light">استثمار متوسط المخاطر</p>
+                    {% else %}
+                        <h2 class="text-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> Low Confidence</h2>
+                        <p class="mb-0 text-light">استثمار عالي المخاطر</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- نموذج طلب التمويل -->
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-success mb-3"><i class="fas fa-hand-holding-usd me-2"></i> طلب تمويل المشروع</h5>
+                    <p class="small text-muted mb-4">أرسل رسالة للمستشار المسؤول لترتيب اجتماع والتفاوض.</p>
+                    
+                    <form method="POST" action="{{ url_for('investor.project_details', app_id=app.id) }}">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">رسالتك للمستشار:</label>
+                            <textarea name="message_content" class="form-control" rows="4" placeholder="مرحباً، نحن مهتمون بتمويل هذا المشروع ونرغب في تحديد موعد للنقاش..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 fw-bold btn-lg shadow-sm mb-3">
+                            <i class="fas fa-paper-plane me-2"></i> إرسال طلب التمويل
+                        </button>
+                        <a href="{{ url_for('investor.portal') }}" class="btn btn-outline-secondary w-100 fw-bold">
+                            إلغاء والعودة
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

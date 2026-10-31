@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}إدارة الكورسات{% endblock %}
+{% block content %}
+<!-- Banner Section -->
+<div class="container-fluid px-0 mb-5">
+    <div class="bg-gradient-primary text-white py-5 px-4 shadow-sm" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <div>
+                    <h1 class="fw-bold display-6 mb-2"><i class="fas fa-graduation-cap me-3 text-warning"></i>أكاديمية المدرب</h1>
+                    <p class="fs-5 mb-0 opacity-75">قم بإدارة كورساتك التدريبية وصمم رحلة تعليمية فريدة لرواد الأعمال.</p>
+                </div>
+                <div class="mt-4 mt-md-0">
+                    <button type="button" class="btn btn-warning btn-lg fw-bold px-5 rounded-pill shadow" data-bs-toggle="modal" data-bs-target="#createCourseModal">
+                        <i class="fas fa-plus-circle me-2"></i> بناء كورس جديد
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <h3 class="fw-bold text-dark mb-4 border-bottom pb-3"><i class="fas fa-layer-group text-primary me-2"></i> كورساتي المرفوعة ({{ courses|length }})</h3>
+    
+    <div class="row g-4">
+        {% if courses %}
+            {% for course in courses %}
+            <div class="col-12 col-md-6 col-xl-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift">
+                    <div class="bg-light p-4 text-center rounded-top-4 border-bottom" style="height: 140px;">
+                        <i class="fas fa-book-open fa-4x text-primary opacity-25"></i>
+                    </div>
+                    <div class="card-body p-4 d-flex flex-column">
+                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 mb-3 align-self-start fw-bold">
+                            موجه لـ: {{ course.program.name }}
+                        </span>
+                        <h4 class="fw-bold text-dark mb-2">{{ course.title }}</h4>
+                        <p class="text-muted small mb-4 flex-grow-1">{{ course.description[:120] }}...</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <span class="text-muted fw-bold"><i class="fas fa-file-video text-danger me-1"></i> {{ course.lessons|length }} دروس</span>
+                            <a href="{{ url_for('trainer.course_editor', course_id=course.id) }}" class="btn btn-primary fw-bold rounded-pill px-4">
+                                إدارة المحتوى <i class="fas fa-arrow-left ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <div class="p-5 bg-white rounded-4 shadow-sm">
+                    <i class="fas fa-photo-video fa-5x text-muted mb-4 opacity-25"></i>
+                    <h3 class="text-dark fw-bold">لا يوجد لديك أي كورسات حالياً</h3>
+                    <p class="text-muted fs-5">اضغط على "بناء كورس جديد" في الأعلى للبدء.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal إنشاء الكورس -->
+<div class="modal fade" id="createCourseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header bg-light border-0 py-4 px-5 rounded-top-4">
+                <h4 class="modal-title fw-bold text-primary"><i class="fas fa-magic me-2"></i> إعداد كورس جديد</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST">
+                <div class="modal-body p-5">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark fs-5">عنوان الكورس *</label>
+                        <input type="text" name="title" class="form-control form-control-lg bg-light border-0" required placeholder="مثال: الاستراتيجيات المالية للشركات الناشئة">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark fs-5">البرنامج المستهدف (الرواد الذين سيشاهدونه) *</label>
+                        <select name="program_id" class="form-select form-select-lg bg-light border-0" required>
+                            <option value="" disabled selected>اختر البرنامج...</option>
+                            {% for prog in programs %}<option value="{{ prog.id }}">{{ prog.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-bold text-dark fs-5">وصف الكورس</label>
+                        <textarea name="description" class="form-control bg-light border-0" rows="4" placeholder="اكتب نبذة عن ما سيتعلمه الرائد في هذا الكورس..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0 p-4 rounded-bottom-4 justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary fw-bold px-4" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary btn-lg fw-bold px-5">إنشاء الكورس وبدء إضافة الدروس</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .hover-lift:hover { transform: translateY(-10px); box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important; }
+</style>
+{% endblock %}

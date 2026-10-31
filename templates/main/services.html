@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+
+{% block title %}خدماتنا - نواتك{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+
+<style>
+    .service-card {
+        transition: all 0.4s ease;
+        height: 100%;
+    }
+    .service-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 20px 40px rgba(26, 35, 126, 0.15) !important;
+    }
+    
+    .btn-service {
+        height: 58px !important;
+        font-size: 1.05rem !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    }
+    
+    .modal-description {
+        background: #f8f9fa;
+        padding: 22px;
+        border-radius: 12px;
+        font-size: 1.13rem;
+        line-height: 1.8;
+    }
+    
+    .price-tag {
+        font-size: 2.15rem;
+        font-weight: 800;
+        color: #1a237e;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero-section position-relative py-5 text-white overflow-hidden" style="padding-top: 4rem !important; padding-bottom: 3.5rem !important;">
+    <div class="container" data-aos="fade-up">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-9">
+                <h1 class="display-5 fw-bold mb-3" style="font-family: 'Tajawal', sans-serif;">
+                    Strategic Partnership & R&D Hub
+                </h1>
+                <h3 class="text-info fw-bold mb-3 fs-4">
+                    Empowering the Future of Iraq’s Digital Economy
+                </h3>
+                <p class="lead fs-5 mx-auto" style="max-width: 760px;">
+                    Join Nawatech’s exclusive R&amp;D phase. Support the development of world-class business incubation tools 
+                    and secure your place as a strategic partner in our ecosystem
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- باقات الخدمات -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-4" data-aos="fade-up">
+            <h2 class="fw-bold display-6 text-dark">باقات الخدمات والشراكات</h2>
+            <div class="mx-auto bg-primary mt-3" style="width: 80px; height: 4px; border-radius: 50px;"></div>
+        </div>
+
+        <div class="row g-4">
+            {% for service in services %}
+            <div class="col-lg-6 col-xl-3" data-aos="fade-up" data-aos-delay="{{ loop.index * 80 }}">
+                <div class="card h-100 service-card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="card-body p-4 d-flex flex-column text-center">
+                        <div class="mx-auto mb-3 bg-primary bg-opacity-10 text-primary rounded-3 d-flex align-items-center justify-content-center" 
+                             style="width: 78px; height: 78px;">
+                            <i class="{{ service.icon }} fa-2x"></i>
+                        </div>
+                        
+                        <h4 class="fw-bold mb-3 fs-5">{{ service.title }}</h4>
+                        <p class="text-muted flex-grow-1 lh-base fs-6">{{ service.description }}</p>
+                        
+                        <div class="mt-auto pt-3">
+                            <!-- عرض السعر فقط للباقات العادية -->
+                            {% if not service.is_special %}
+                                <div class="price-tag mb-3 fs-4">
+                                    {{ service.price }} 
+                                    <small class="fs-6 text-muted">
+                                        {{ service.currency_symbol if service.currency_symbol else 'RM' }}
+                                    </small>
+                                </div>
+                            {% else %}
+                                <div class="mb-3">
+                                    
+                                </div>
+                            {% endif %}
+
+                            <!-- الزر حسب نوع الباقة -->
+                            {% if service.is_special %}
+                                <button onclick="openSpecialPartnerModal()" 
+                                        class="btn btn-primary btn-service rounded-pill fw-bold">
+                                    {{ service.button_text }}
+                                </button>
+                            {% else %}
+                                <button onclick="openServiceModal({{ loop.index0 }})" 
+                                        class="btn btn-primary btn-service rounded-pill fw-bold">
+                                    {{ service.button_text }}
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Modal عادي للباقات التي تدفع -->
+<div class="modal fade" id="serviceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h4 class="modal-title fw-bold text-primary" id="modalTitle"></h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="modal-description mb-4" id="modalDescription"></div>
+
+                <form id="serviceForm">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">الدولة</label>
+                            <input type="text" id="country" class="form-control form-control-lg" placeholder="مثال: العراق" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">رقم الهاتف</label>
+                            <input type="tel" id="phone" class="form-control form-control-lg" placeholder="أدخل رقم الهاتف" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">الاسم الكامل</label>
+                            <input type="text" id="fullName" class="form-control form-control-lg" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">البريد الإلكتروني</label>
+                            <input type="email" id="email" class="form-control form-control-lg" required>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 form-check">
+                        <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                        <label class="form-check-label" for="agreeTerms">
+                            أوافق على 
+                            <a href="{{ url_for('terms_of_service') }}" target="_blank" class="text-primary fw-bold">شروط الخدمة</a> و
+                            <a href="{{ url_for('refund_policy') }}" target="_blank" class="text-primary fw-bold">سياسة الاسترداد</a>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">إغلاق</button>
+                <button type="button" onclick="submitServiceForm()" id="payButton" 
+                        class="btn btn-primary px-5 fw-bold" disabled>
+                    المتابعة إلى الدفع
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal خاص بباقة Become a Partner -->
+<div class="modal fade" id="specialPartnerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h4 class="modal-title fw-bold text-primary" id="specialModalTitle">الشريك الاستراتيجي | Development Partner</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="modal-description mb-4" id="specialModalDescription">
+                    <strong>ساهم في مرحلة البحث والتطوير (R&D)</strong><br>
+                    ادعم بناء البنية التحتية لحاضنة نواتك الرقمية واحصل على أولوية في المجلس الاستشاري.
+                </div>
+
+                <form id="specialPartnerForm">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-bold">الاسم الكامل</label>
+                            <input type="text" id="partnerName" class="form-control form-control-lg" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">البريد الإلكتروني</label>
+                            <input type="email" id="partnerEmail" class="form-control form-control-lg" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">رقم الهاتف</label>
+                            <input type="tel" id="partnerPhone" class="form-control form-control-lg" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">الدولة</label>
+                            <input type="text" id="partnerCountry" class="form-control form-control-lg" placeholder="مثال: العراق" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">لماذا ترغب أن تكون شريكاً معنا؟</label>
+                            <textarea id="partnerReason" class="form-control" rows="5" placeholder="اكتب هنا أسباب رغبتك في الشراكة..." required></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">إغلاق</button>
+                <button type="button" onclick="submitSpecialPartnerForm()" 
+                        class="btn btn-primary px-5 fw-bold">
+                    إرسال الطلب
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+
+<script>
+// تفعيل AOS
+AOS.init({ duration: 800, once: true });
+
+// بيانات الباقات العادية
+const serviceData = [
+    { 
+        title: "Enterprise Advisory & Growth", 
+        description: "<strong>استشارات استراتيجية متكاملة</strong><br>جلسات أعمال مخصصة لتطوير الشركات الناشئة في السوق العراقي." 
+    },
+    { 
+        title: "Digital Incubation & Training", 
+        description: "<strong>تدريب احترافي وأدوات إدارة الأعمال</strong><br>احجز مقعدك في برامج التدريب الرقمية المصممة خصيصاً للسوق العراقي." 
+    },
+    { 
+        title: "Early Access Licensing", 
+        description: "<strong>ترخيص مبكر + أدوات Nawatech</strong><br>كن من أوائل المستخدمين واحصل على النسخة الرسمية فور الإطلاق." 
+    }
+];
+
+let currentIndex = 0;
+
+// ====================== Modal عادي للباقات التي تدفع ======================
+function openServiceModal(index) {
+    currentIndex = index;
+    const data = serviceData[index];
+
+    document.getElementById('modalTitle').textContent = data.title;
+    document.getElementById('modalDescription').innerHTML = data.description;
+
+    document.getElementById('serviceForm').reset();
+    document.getElementById('payButton').disabled = true;
+
+    new bootstrap.Modal(document.getElementById('serviceModal')).show();
+}
+
+// ====================== Modal خاص بباقة Become a Partner ======================
+function openSpecialPartnerModal() {
+    document.getElementById('specialModalTitle').textContent = "الشريك الاستراتيجي | Development Partner";
+    document.getElementById('specialModalDescription').innerHTML = 
+        "<strong>ساهم في مرحلة البحث والتطوير (R&D)</strong><br>ادعم بناء البنية التحتية لحاضنة نواتك الرقمية واحصل على أولوية في المجلس الاستشاري.";
+
+    document.getElementById('specialPartnerForm').reset();
+    new bootstrap.Modal(document.getElementById('specialPartnerModal')).show();
+}
+
+// ====================== إرسال استمارة الشريك مع منع الضغط المتكرر ======================
+function submitSpecialPartnerForm() {
+    const form = document.getElementById('specialPartnerForm');
+    const submitBtn = document.querySelector('#specialPartnerModal .btn-primary');
+
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    // تعطيل الزر وتغيير النص
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+        جاري الإرسال...
+    `;
+
+    const formData = new FormData();
+    formData.append('name', document.getElementById('partnerName').value);
+    formData.append('email', document.getElementById('partnerEmail').value);
+    formData.append('phone', document.getElementById('partnerPhone').value);
+    formData.append('country', document.getElementById('partnerCountry').value);
+    formData.append('reason', document.getElementById('partnerReason').value);
+    formData.append('service_title', "الشريك الاستراتيجي | Development Partner");
+
+    fetch('/submit-partner-request', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert("✅ تم إرسال طلبك بنجاح!\nسيتم التواصل معك في أقرب وقت.");
+            bootstrap.Modal.getInstance(document.getElementById('specialPartnerModal')).hide();
+        } else {
+            alert("حدث خطأ: " + (data.message || "يرجى المحاولة مرة أخرى"));
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("حدث خطأ في الإرسال، يرجى المحاولة مرة أخرى.");
+    })
+    .finally(() => {
+        // إعادة تفعيل الزر بعد الانتهاء
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    });
+}
+// إرسال النموذج العادي (المتابعة إلى الدفع)
+function submitServiceForm() {
+    const form = document.getElementById('serviceForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    // إنشاء نموذج مؤقت للإرسال
+    const tempForm = document.createElement('form');
+    tempForm.method = 'POST';
+    tempForm.action = '/create-checkout-session';
+    tempForm.style.display = 'none';
+
+    // إضافة service_id
+    const serviceInput = document.createElement('input');
+    serviceInput.type = 'hidden';
+    serviceInput.name = 'service_id';
+    serviceInput.value = currentIndex + 1;
+    tempForm.appendChild(serviceInput);
+
+    // نسخ باقي الحقول
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        if (input.type !== 'checkbox' || input.checked) {
+            const newInput = document.createElement('input');
+            newInput.type = 'hidden';
+            newInput.name = input.name || input.id;
+            newInput.value = input.value;
+            tempForm.appendChild(newInput);
+        }
+    });
+
+    document.body.appendChild(tempForm);
+    tempForm.submit();
+}
+// ====================== تفعيل زر الدفع في الـ Modal العادي ======================
+document.addEventListener('DOMContentLoaded', function() {
+    const agreeCheckbox = document.getElementById('agreeTerms');
+    const payButton = document.getElementById('payButton');
+
+    if (agreeCheckbox && payButton) {
+        agreeCheckbox.addEventListener('change', function() {
+            payButton.disabled = !this.checked;
+        });
+    }
+});
+</script>
+
+{% endblock %}

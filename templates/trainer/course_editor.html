@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% block title %}محرر الكورس المتقدم{% endblock %}
+{% block content %}
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<!-- Course Header -->
+<div class="bg-dark text-white py-4 mb-4 shadow-sm">
+    <div class="container-fluid px-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <div>
+                <span class="badge bg-warning text-dark mb-2">محرر الدروس المتقدم</span>
+                <h2 class="fw-bold mb-0">{{ course.title }}</h2>
+            </div>
+            <a href="{{ url_for('trainer.courses') }}" class="btn btn-outline-light mt-3 mt-md-0 fw-bold px-4">
+                <i class="fas fa-arrow-right me-2"></i> حفظ والعودة
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-4 mb-5">
+    <div class="row g-4">
+        
+        <!-- SECTION 1: ADD NEW LESSON (FULL WIDTH DESIGN) -->
+        <div class="col-xl-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white py-4 px-5 border-bottom">
+                    <h4 class="fw-bold text-primary mb-0"><i class="fas fa-plus-square me-2"></i> إنشاء درس شامل جديد</h4>
+                </div>
+                <div class="card-body p-4 p-md-5 bg-light">
+                    <form method="POST" enctype="multipart/form-data" id="lessonForm">
+                        
+                        <!-- Basic Info -->
+                        <div class="row mb-5 bg-white p-4 rounded-4 shadow-sm">
+                            <h5 class="fw-bold text-dark border-bottom pb-2 mb-4">1. معلومات الدرس</h5>
+                            <div class="col-md-9 mb-3">
+                                <label class="form-label fw-bold">عنوان الدرس *</label>
+                                <input type="text" name="title" id="lessonTitle" class="form-control form-control-lg bg-light" required placeholder="مثال: مقدمة في بناء نموذج العمل">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold text-danger">رقم / ترتيب الدرس *</label>
+                                <input type="number" name="order_num" class="form-control form-control-lg text-center fw-bold text-danger" required value="{{ (course.lessons|length) + 1 }}">
+                            </div>
+                        </div>
+
+                        <!-- Rich Text & AI Assistant -->
+                        <div class="row mb-5 bg-white p-4 rounded-4 shadow-sm position-relative">
+                            <h5 class="fw-bold text-dark border-bottom pb-2 mb-4">2. المحتوى النصي والشرح</h5>
+                            
+                            <!-- AI Magic Box -->
+                            <div class="col-12 mb-3">
+                                <div class="p-3 bg-primary bg-opacity-10 border border-primary rounded-3">
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-robot fa-2x text-primary me-3"></i>
+                                            <div>
+                                                <h6 class="fw-bold text-primary mb-0">المساعد الذكي (AI)</h6>
+                                                <small class="text-muted">اكتب فكرة الدرس وسيقوم الذكاء الاصطناعي بكتابة الشرح لك.</small>
+                                            </div>
+                                        </div>
+                                        <div class="input-group" style="max-width: 500px;">
+                                            <input type="text" id="aiPrompt" class="form-control" placeholder="اكتب موضوع الدرس هنا...">
+                                            <button class="btn btn-primary fw-bold" type="button" onclick="generateText()">
+                                                <i class="fas fa-magic me-1"></i> توليد الشرح
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <input type="hidden" name="text_content" id="textContentInput">
+                                <div id="editor-container" style="height: 300px; font-size: 1.1rem;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Media Attachments -->
+                        <div class="row mb-5 bg-white p-4 rounded-4 shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-4">
+                                <h5 class="fw-bold text-dark mb-0">3. المرفقات والوسائط المتعددة (اختياري)</h5>
+                                <span class="badge bg-secondary">يمكنك رفعها جميعاً</span>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold text-danger"><i class="fas fa-video me-2"></i> فيديو الشرح (MP4)</label>
+                                <input type="file" name="course_video" class="form-control form-control-lg bg-light" accept="video/*">
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold text-danger"><i class="fas fa-file-pdf me-2"></i> ملزمة أو كتاب (PDF)</label>
+                                <input type="file" name="course_pdf" class="form-control form-control-lg bg-light" accept=".pdf">
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold text-info"><i class="fas fa-image me-2"></i> صورة توضيحية / إنفوجرافيك</label>
+                                <input type="file" name="course_image" class="form-control form-control-lg bg-light" accept="image/*">
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold text-primary"><i class="fas fa-link me-2"></i> رابط خارجي (Youtube/Drive)</label>
+                                <input type="url" name="link_url" class="form-control form-control-lg bg-light text-start" dir="ltr" placeholder="https://...">
+                            </div>
+                        </div>
+
+                        <!-- Smart Quiz Generator -->
+                        <div class="row mb-5 bg-white p-4 rounded-4 shadow-sm border-start border-success border-5">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h5 class="fw-bold text-success mb-1"><i class="fas fa-question-circle me-2"></i>4. اختبار الدرس (AI)</h5>
+                                    <p class="text-muted small mb-0">قم بتوليد اختبار تفاعلي سريع يقيس فهم الرائد للدرس.</p>
+                                </div>
+                                <button type="button" class="btn btn-outline-success fw-bold" id="quizBtn" onclick="generateQuiz()">
+                                    <i class="fas fa-magic me-1"></i> توليد اختبار أوتوماتيكي
+                                </button>
+                            </div>
+                            <input type="hidden" name="quiz_data" id="quizDataInput">
+                            <div id="quizPreview" class="bg-light p-3 rounded" style="display: none;"></div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-dark btn-lg px-5 py-3 fw-bold shadow-lg w-100" style="border-radius: 15px;">
+                                <i class="fas fa-save me-2 fs-5"></i> حفظ الدرس وإضافته للكورس
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: EXISTING LESSONS LIST -->
+        <div class="col-xl-4">
+            <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-black py-4 px-4 rounded-top-4 border-0">
+                    <h5 class="fw-bold mb-0"><i class="fas fa-list-ol me-2"></i> فهرس محتويات الكورس</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if course.lessons %}
+                    <div class="list-group list-group-flush">
+                        {% for lesson in course.lessons %}
+                        <div class="list-group-item p-4 border-bottom">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="bg-light text-primary fw-bold rounded-circle d-flex justify-content-center align-items-center shadow-sm" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                                    {{ lesson.order_num }}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold text-dark mb-2">{{ lesson.title }}</h6>
+                                    
+                                    <!-- أيقونات المحتوى الموجود داخل هذا الدرس -->
+                                    <div class="d-flex flex-wrap gap-2">
+                                        {% if lesson.text_content %}<span class="badge bg-secondary bg-opacity-10 text-secondary"><i class="fas fa-align-right"></i> نص</span>{% endif %}
+                                        {% if lesson.video_path %}<span class="badge bg-danger bg-opacity-10 text-danger"><i class="fas fa-video"></i> فيديو</span>{% endif %}
+                                        {% if lesson.pdf_path %}<span class="badge bg-danger bg-opacity-10 text-danger"><i class="fas fa-file-pdf"></i> PDF</span>{% endif %}
+                                        {% if lesson.image_path %}<span class="badge bg-info bg-opacity-10 text-info"><i class="fas fa-image"></i> صورة</span>{% endif %}
+                                        {% if lesson.link_url %}<span class="badge bg-primary bg-opacity-10 text-primary"><i class="fas fa-link"></i> رابط</span>{% endif %}
+                                        {% if lesson.quiz_data %}<span class="badge bg-success bg-opacity-10 text-success"><i class="fas fa-question"></i> اختبار</span>{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="p-5 text-center">
+                        <i class="fas fa-folder-open fa-4x text-muted opacity-25 mb-3"></i>
+                        <h6 class="text-muted fw-bold">الكورس فارغ حالياً</h6>
+                        <p class="small text-muted mb-0">قم بإضافة درسك الأول من المحرر.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+    // تهيئة محرر النصوص
+    var quill = new Quill('#editor-container', {
+        theme: 'snow',
+        placeholder: 'اكتب الشرح التفصيلي للدرس هنا...',
+        modules: { toolbar: [ [{ 'header': [1, 2, 3, false] }], ['bold', 'italic', 'underline', 'strike'], [{'list': 'ordered'}, {'list': 'bullet'}], [{'color': []}, {'background': []}], ['clean'] ] }
+    });
+
+    // حفظ النص قبل الإرسال
+    document.getElementById('lessonForm').onsubmit = function() {
+        document.getElementById('textContentInput').value = quill.root.innerHTML;
+    };
+
+    // المساعد الذكي لكتابة الشرح
+    async function generateText() {
+        const promptText = document.getElementById('aiPrompt').value;
+        const btn = event.currentTarget;
+        
+        if(!promptText) { alert("اكتب موضوعاً أولاً في صندوق المساعد الذكي!"); return; }
+        if(!document.getElementById('lessonTitle').value) { document.getElementById('lessonTitle').value = promptText; }
+        
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch("{{ url_for('trainer.generate_lesson_text') }}", {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({prompt: promptText})
+            });
+            const data = await response.json();
+            if(data.status === 'success') {
+                quill.clipboard.dangerouslyPasteHTML(data.content);
+            } else { alert(data.message); }
+        } catch(e) { alert('خطأ في الاتصال بالذكاء الاصطناعي.'); }
+        
+        btn.innerHTML = '<i class="fas fa-magic me-1"></i> توليد الشرح';
+        btn.disabled = false;
+    }
+
+    // المساعد الذكي لتوليد الاختبار
+    async function generateQuiz() {
+        const title = document.getElementById('lessonTitle').value;
+        const btn = document.getElementById('quizBtn');
+        
+        if(!title) { alert("يجب كتابة عنوان الدرس أولاً لتوليد الأسئلة بناءً عليه."); return; }
+
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> جاري توليد الأسئلة...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch("{{ url_for('trainer.generate_quiz') }}", {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({title: title})
+            });
+            const data = await response.json();
+            if(data.status === 'success') {
+                document.getElementById('quizDataInput').value = JSON.stringify(data.quiz);
+                const preview = document.getElementById('quizPreview');
+                preview.style.display = 'block';
+                preview.innerHTML = `<h6 class="text-success fw-bold"><i class="fas fa-check-circle me-2"></i> تم توليد ${data.quiz.length} أسئلة بنجاح. سيتم إرفاقها بهذا الدرس عند الحفظ.</h6>`;
+            } else { alert(data.message); }
+        } catch(e) { alert('خطأ في الاتصال بالذكاء الاصطناعي.'); }
+        
+        btn.innerHTML = '<i class="fas fa-check me-1"></i> تم التوليد بنجاح';
+        btn.classList.replace('btn-outline-success', 'btn-success');
+    }
+</script>
+<style>
+    .ql-toolbar { border-radius: 10px 10px 0 0 !important; background: #f8f9fa; border: 1px solid #dee2e6 !important; }
+    .ql-container { border-radius: 0 0 10px 10px !important; border: 1px solid #dee2e6 !important; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+</style>
+{% endblock %}

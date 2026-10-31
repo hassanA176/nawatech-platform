@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}جلسات الإرشاد الرقمي{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="fw-bold mb-4"><i class="fas fa-video text-info me-2"></i> جلسات الإرشاد الرقمي المباشرة</h2>
+    <div class="row">
+        <div class="col-md-5 mb-4">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-primary text-black"><h5 class="mb-0">طلب اجتماع مع المدرب</h5></div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('dashboard.request_meeting', app_id=app.id) }}">
+                        <div class="mb-3">
+                            <label class="fw-bold">اختر اليوم المناسب</label>
+                            <input type="date" name="date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">اختر الوقت</label>
+                            <input type="time" name="time" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-info w-100 fw-bold text-dark"><i class="fas fa-paper-plane me-2"></i> إرسال الطلب للمدرب</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-dark text-black"><h5 class="mb-0">سجل الاجتماعات</h5></div>
+                <div class="card-body">
+                    {% if meetings %}
+                        {% for m in meetings %}
+                        <div class="p-3 border rounded mb-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-1"><i class="fas fa-calendar text-primary me-2"></i> {{ m.requested_date }} | {{ m.requested_time }}</h6>
+                                {% if m.status == 'pending' %}<span class="badge bg-warning text-dark">في انتظار موافقة المدرب</span>
+                                {% elif m.status == 'approved' %}<span class="badge bg-success">تمت الموافقة</span>{% endif %}
+                            </div>
+                            {% if m.status == 'approved' %}
+                                <a href="{{ url_for('dashboard.live_room', room_name=m.room_name) }}" target="_blank" class="btn btn-danger fw-bold"><i class="fas fa-video me-1"></i> دخول الاجتماع الآن</a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-4">لا توجد اجتماعات مسجلة.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

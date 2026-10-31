@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}تم الدفع بنجاح - نواتك{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-lg border-0 text-center p-5">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle text-success" style="font-size: 6rem; opacity: 0.9;"></i>
+                </div>
+
+                <h1 class="display-5 fw-bold text-success mb-3">تم الدفع بنجاح!</h1>
+                
+                <div class="alert alert-success fs-5 py-4 mb-4">
+                    شكراً لثقتكم بـ <strong>نواتك</strong>.<br>
+                    تم تأكيد استلام دفعة باقة <strong>{{ service_title|default('الخدمة') }}</strong> بنجاح.
+                </div>
+
+                <p class="lead text-muted mb-4 lh-lg">
+                    لقد تم تفعيل طلبكم في نظامنا، وفريقنا المختص سيباشر في إجراءات التنفيذ لضمان حصولكم على أفضل تجربة رقمية.<br><br>
+                    سنوافيكم بالتحديثات أو روابط الوصول في أقرب وقت ممكن.
+                </p>
+
+                <p class="fw-bold text-dark fs-5 mb-5">
+                    نحن فخورون بانضمامكم إلى بيئتنا الريادية 🚀
+                </p>
+
+                <div class="d-grid gap-3 d-md-flex justify-content-center">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg px-5">
+                        العودة إلى الصفحة الرئيسية
+                    </a>
+                    <a href="{{ url_for('services') }}" class="btn btn-outline-primary btn-lg px-5">
+                        تصفح باقات أخرى
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

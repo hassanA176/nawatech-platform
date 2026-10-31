@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}سياسة الاسترداد والإلغاء - نواتك{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5" style="background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);">
+    <div class="container text-center pt-5 pb-3">
+        <i class="fas fa-undo-alt fa-4x text-warning mb-3"></i>
+        <h1 class="display-5 fw-bold text-white mb-2">سياسة الاسترداد والإلغاء</h1>
+        <p class="lead text-white-50 mb-0">Refund & Cancellation Policy</p>
+    </div>
+</section>
+
+<!-- Content Section -->
+<section class="py-5 bg-light">
+    <div class="container mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-0 shadow-lg rounded-4 border-top border-danger border-4">
+                    <!-- اتجاه النص LTR لأن البنود القانونية بالإنجليزية -->
+                    <div class="card-body p-4 p-md-5" dir="ltr" style="text-align: left;">
+                        
+                        <div class="mb-5">
+                            <p class="fs-5 text-muted lh-lg">
+                                <strong class="text-dark">At Nawatech (operated by BUTTERBOOK SDN BHD)</strong>, we are dedicated to building a world-class digital ecosystem for business incubation and consultancy.
+                            </p>
+                        </div>
+                        
+                        <div class="mb-4 bg-white p-4 rounded-3 border shadow-sm hover-lift">
+                            <h5 class="fw-bold text-primary mb-3"><i class="fas fa-cogs me-2"></i> 1. Nature of Services</h5>
+                            <p class="text-muted mb-0">Our services involve high-level business consultancy, professional training modules, and the ongoing development of specialized software tools. These services require immediate allocation of technical resources, expert hours, and research and development (R&D) costs.</p>
+                        </div>
+
+                        <div class="mb-4 bg-white p-4 rounded-3 border shadow-sm hover-lift">
+                            <h5 class="fw-bold text-danger mb-3"><i class="fas fa-ban me-2"></i> 2. Non-Refundable Policy</h5>
+                            <p class="text-muted mb-0">Due to the digital and intellectual nature of our services and the immediate utilization of funds for platform development and customization, <strong class="text-danger">all payments and advance service fees are non-refundable</strong> once the payment is processed.</p>
+                        </div>
+
+                        <div class="mb-4 bg-white p-4 rounded-3 border shadow-sm hover-lift">
+                            <h5 class="fw-bold text-success mb-3"><i class="fas fa-handshake me-2"></i> 3. Commitment to Quality</h5>
+                            <p class="text-muted mb-0">While we do not offer refunds, we are committed to client satisfaction. If you are unsatisfied with a specific consultancy session or digital module, we will work with you to provide alternative credit or additional support within the Nawatech ecosystem.</p>
+                        </div>
+
+                        <div class="mb-5 bg-white p-4 rounded-3 border shadow-sm hover-lift border-start border-danger border-4">
+                            <h5 class="fw-bold text-dark mb-3"><i class="fas fa-exclamation-circle text-danger me-2"></i> 4. Disputes</h5>
+                            <p class="text-muted mb-0">Any disputes regarding transactions must be addressed directly with our support team at <a href="mailto:info@nawatech.org" class="fw-bold text-primary text-decoration-none">info@nawatech.org</a> before initiating any third-party financial claims.</p>
+                        </div>
+
+                        <hr class="my-4">
+                        
+                        <!-- Contact Info -->
+                        <div class="bg-danger bg-opacity-10 p-4 rounded-4 text-center mt-4">
+                            <h6 class="fw-bold text-dark mb-2">For inquiries, please contact us at:</h6>
+                            <a href="mailto:info@nawatech.org" class="fs-5 fw-bold text-danger text-decoration-none">
+                                <i class="fas fa-envelope me-2"></i>info@nawatech.org
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.10)!important; }
+</style>
+{% endblock %}

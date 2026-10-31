@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}{{ startup.name }} - تفاصيل الشركة{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mb-0">{{ startup.name }}</h1>
+                <div>
+                    <a href="{{ url_for('dashboard.startup_edit', startup_id=startup.id) }}" 
+                       class="btn btn-primary me-2">
+                        <i class="fas fa-edit me-1"></i> تعديل البيانات
+                    </a>
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-right me-1"></i> العودة للوحة التحكم
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- بطاقة المعلومات الأساسية -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header custom-dark-header">
+            <h5 class="mb-0">
+                <i class="fas fa-info-circle me-2"></i> 
+                المعلومات الأساسية
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <strong>اسم الشركة:</strong><br>
+                    {{ startup.name }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <strong>القطاع:</strong><br>
+                    {{ startup.sector or 'غير محدد' }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <strong>المرحلة:</strong><br>
+                    {{ startup.stage or 'غير محدد' }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <strong>المدينة:</strong><br>
+                    {{ startup.city or 'غير محدد' }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <strong>تاريخ الإنشاء:</strong><br>
+                    {{ startup.created_at.strftime('%Y-%m-%d %H:%M') }}
+                </div>
+            </div>
+            
+            <hr>
+            <strong>ملخص المشروع:</strong>
+            <p class="mt-2">{{ startup.summary | safe or 'لا يوجد ملخص' }}</p>
+        </div>
+    </div>
+
+    <!-- تفاصيل العمل -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header custom-dark-header">
+            <h5 class="mb-0">
+                <i class="fas fa-lightbulb me-2"></i> 
+                تفاصيل العمل
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <strong>المشكلة التي يحلها المشروع:</strong>
+                    <p>{{ startup.problem or 'غير محدد' }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>الحل المقترح:</strong>
+                    <p>{{ startup.solution or 'غير محدد' }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>السوق المستهدف:</strong>
+                    <p>{{ startup.target_market or 'غير محدد' }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>نموذج العمل:</strong>
+                    <p>{{ startup.business_model or 'غير محدد' }}</p>
+                </div>
+                <div class="col-12">
+                    <strong>الميزة التنافسية:</strong>
+                    <p>{{ startup.competitive_advantage or 'غير محدد' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- معلومات الفريق -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header custom-dark-header">
+            <h5 class="mb-0">
+                <i class="fas fa-users me-2"></i> 
+                معلومات الفريق
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <strong>حجم الفريق:</strong><br>
+                    {{ startup.team_size or 'غير محدد' }}
+                </div>
+                <div class="col-md-8 mb-3">
+                    <strong>المهارات الأساسية:</strong><br>
+                    {{ startup.key_skills or 'غير محدد' }}
+                </div>
+                <div class="col-12">
+                    <strong>خبرة الفريق:</strong>
+                    <p>{{ startup.team_experience or 'غير محدد' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- المعلومات المالية -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header custom-dark-header">
+            <h5 class="mb-0">
+                <i class="fas fa-chart-line me-2"></i> 
+                المعلومات المالية
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <strong>مرحلة التمويل:</strong><br>
+                    {{ startup.funding_stage or 'غير محدد' }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>المبلغ المطلوب (دولار):</strong><br>
+                    {{ startup.funding_amount | default('غير محدد') }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>الإيرادات الحالية (شهرياً - دولار):</strong><br>
+                    {{ startup.current_revenue | default('غير محدد') }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>توقعات الإيرادات (سنوياً - دولار):</strong><br>
+                    {{ startup.revenue_projection | default('غير محدد') }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- أزرار التحكم السفلية -->
+    <div class="text-center mt-5">
+        <a href="{{ url_for('dashboard.startup_edit', startup_id=startup.id) }}" 
+           class="btn btn-lg btn-primary me-3">
+            <i class="fas fa-edit me-1"></i> تعديل البيانات
+        </a>
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-lg btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> العودة إلى الداشبورد
+        </a>
+    </div>
+</div>
+
+<style>
+    .custom-dark-header {
+        background-color: #0f0f0f;      /* أسود غامق جدًا */
+        color: #000000 !important;      /* النص الرئيسي (العنوان) أسود */
+        border-bottom: 1px solid #222;
+    }
+    
+    .custom-dark-header i {
+        color: #000000 !important;      /* الأيقونة سوداء */
+    }
+    
+    .custom-dark-header h5 {
+        color: #000000 !important;      /* نضمن أن h5 أسود أيضًا */
+    }
+</style>
+{% endblock %}

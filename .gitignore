@@ -1,0 +1,35 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Runtime data
+instance/
+*.db
+*.sqlite
+*.sqlite3
+logs/
+*.log
+
+# User uploads / private files
+static/uploads/*
+!static/uploads/.gitkeep
+uploads/
+
+# Large training media (not part of public portfolio snapshot)
+videos/*
+!videos/.gitkeep
+*.mp4
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

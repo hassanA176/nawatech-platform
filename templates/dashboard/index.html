@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}لوحة التحكم - نواتك{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="sidebar">
+                <h5 class="mb-3">لوحة التحكم</h5>
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="{{ url_for('dashboard.index') }}">
+                        <i class="fas fa-tachometer-alt me-2"></i>الرئيسية
+                    </a>
+                    <a class="nav-link" href="{{ url_for('dashboard.new_startup') }}">
+                        <i class="fas fa-plus me-2"></i>شركة جديدة
+                    </a>
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-graduation-cap me-2"></i>حقائبي التدريبية
+                    </a>
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-certificate me-2"></i>شهاداتي
+                    </a>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-building fa-2x text-primary mb-2"></i>
+                            <h4 class="fw-bold">{{ stats.startups_count }}</h4>
+                            <p class="text-muted mb-0">شركاتي</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-file-alt fa-2x text-info mb-2"></i>
+                            <h4 class="fw-bold">{{ stats.applications_count }}</h4>
+                            <p class="text-muted mb-0">طلباتي</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                            <h4 class="fw-bold">{{ stats.accepted_count }}</h4>
+                            <p class="text-muted mb-0">مقبولة</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                            <h4 class="fw-bold">{{ stats.pending_count }}</h4>
+                            <p class="text-muted mb-0">في الانتظار</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- My Startups -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">شركاتي الناشئة</h5>
+                    <a href="{{ url_for('dashboard.new_startup') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-1"></i>شركة جديدة
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if startups %}
+                    <div class="row">
+                        {% for startup in startups %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ startup.name }}</h6>
+                                    <p class="card-text text-muted">{{ startup.summary[:100] }}...</p>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="badge bg-secondary">{{ startup.sector }}</span>
+                                        <span class="badge bg-info">{{ startup.stage }}</span>
+                                    </div>
+                                    <a href="{{ url_for('dashboard.startup_details', startup_id=startup.id) }}" class="btn btn-outline-primary btn-sm mt-2">
+                                        عرض التفاصيل
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-building fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">لم تقم بإنشاء أي شركة ناشئة بعد</p>
+                        <a href="{{ url_for('dashboard.new_startup') }}" class="btn btn-primary">أنشئ شركتك الأولى</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Available Programs -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">البرامج المتاحة</h5>
+                </div>
+                <div class="card-body">
+                    {% if programs %}
+                    <div class="row">
+                        {% for program in programs %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <span class="badge bg-primary mb-2">{{ program.type }}</span>
+                                    <h6 class="card-title">{{ program.name }}</h6>
+                                    <p class="card-text">{{ program.city }}</p>
+                                    <a href="{{ url_for('dashboard.apply', program_id=program.id) }}" class="btn btn-primary btn-sm w-100">
+                                        تقدم الآن
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">لا توجد برامج متاحة حالياً</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

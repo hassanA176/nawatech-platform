@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}مراجعة وتقييم الرائد{% endblock %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark"><i class="fas fa-folder-open text-primary me-2"></i> ملف تقييم الرائد: {{ app.startup.owner.full_name }}</h2>
+        <a href="{{ url_for('trainer.dashboard') }}" class="btn btn-outline-secondary fw-bold">العودة للوحة</a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            
+            <!-- 1. عرض استمارة 1 (إذا تم تسليمها) -->
+            <div class="card border-0 shadow-sm mb-4 border-top border-info border-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold text-info mb-0"><i class="fas fa-file-alt me-2"></i> استمارة 1 (فكرة المشروع)</h5>
+                    {% if form_one %}<span class="badge bg-success">تم التسليم</span>{% else %}<span class="badge bg-secondary">لم تسلم بعد</span>{% endif %}
+                </div>
+                <div class="card-body">
+                    {% if form_one %}
+                        <div class="mb-3">
+                            <h6 class="fw-bold text-dark bg-light p-2 rounded">إحتياجات الزبون (ماذا وأين ولمن؟)</h6>
+                            <p class="fs-5 text-muted ms-2" style="white-space: pre-wrap;">{{ form_one.customer_needs }}</p>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-dark bg-light p-2 rounded">الهدف الأسمى للمشروع</h6>
+                            <p class="fs-5 text-muted ms-2" style="white-space: pre-wrap;">{{ form_one.ultimate_goal }}</p>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">الرائد لم يصل إلى هذا الدرس بعد أو لم يقم بتعبئة الاستمارة.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- 2. عرض مشروع التخرج -->
+            <div class="card border-0 shadow-sm border-top border-success border-4 mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold text-success mb-0"><i class="fas fa-flag-checkered me-2"></i> مشروع التخرج النهائي</h5>
+                    {% if app.final_project_submitted %}<span class="badge bg-success">تم التسليم</span>{% else %}<span class="badge bg-secondary">لم يسلم بعد</span>{% endif %}
+                </div>
+                <div class="card-body p-4">
+                    {% if app.final_project_file %}
+                        <div class="alert bg-light border text-center py-4">
+                            <i class="fas fa-file-pdf fa-3x text-danger mb-3"></i>
+                            <h5 class="fw-bold">يوجد ملف مرفق للتقييم</h5>
+                            <a href="{{ url_for('static', filename=app.final_project_file) }}" target="_blank" class="btn btn-primary mt-2 fw-bold px-4">
+                                <i class="fas fa-download me-2"></i> تحميل الملف
+                            </a>
+                        </div>
+                    {% elif app.final_project_text %}
+                        <h6 class="fw-bold text-dark mb-3">الإجابات عبر المحرر الرقمي:</h6>
+                        <div class="p-4 bg-light rounded-3 border" style="white-space: pre-wrap; font-size: 1.1rem;">{{ app.final_project_text }}</div>
+                    {% else %}
+                        <p class="text-muted text-center">الرائد لم يقم برفع المشروع النهائي حتى الآن.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- زر التخريج وإصدار الشهادة -->
+            <hr class="my-5">
+
+            <div class="alert alert-success border-success text-dark">
+                <p class="small mb-3 fw-bold">هل أتم الرائد مشروعه بنجاح ويستحق التخرج؟</p>
+                <form method="POST" action="{{ url_for('trainer.grant_certificate', app_id=app.id) }}" onsubmit="return confirm('تأكيد التخرج وإصدار الشهادة للرائد؟')">
+                    <button type="submit" class="btn btn-success w-100 fw-bold shadow-sm">
+                        <i class="fas fa-certificate me-2"></i> تخريج الرائد ومنحه الشهادة
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- 3. إرسال الملاحظات (تصل للرائد في لوحته) -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm bg-light sticky-top" style="top: 20px;">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-dark mb-4"><i class="fas fa-paper-plane text-warning me-2"></i> إرسال ملاحظاتك للرائد</h5>
+                    <form method="POST">
+                        <div class="mb-4">
+                            <label class="form-label text-muted small">هذه الملاحظات ستظهر للرائد في مساحة التعلم الخاصة به لكي يقرأها ويقوم بالتعديلات.</label>
+                            <textarea name="feedback" class="form-control" rows="8" placeholder="مثال: الاستمارة 1 ممتازة، لكن في مشروع التخرج يرجى توضيح الشريحة رقم 3...">{{ app.trainer_feedback or '' }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold btn-lg shadow-sm">
+                            <i class="fas fa-save me-2"></i> حفظ وإرسال الملاحظات
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

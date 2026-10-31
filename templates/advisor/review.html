@@ -1,0 +1,479 @@
+{% extends "base.html" %}
+
+{% block title %}مراجعة الطلبات - نواتك{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Review Sidebar -->
+        <div class="col-xl-2 col-lg-3">
+            <div class="sidebar">
+                <div class="sidebar-header mb-4">
+                    <h5 class="fw-bold text-primary mb-0">
+                        <i class="fas fa-clipboard-check me-2"></i>
+                        نظام المراجعة
+                    </h5>
+                </div>
+                
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="#pending">
+                        <i class="fas fa-clock me-2"></i>
+                        في الانتظار
+                        <span class="badge bg-warning ms-auto">5</span>
+                    </a>
+                    <a class="nav-link" href="#reviewed">
+                        <i class="fas fa-check-circle me-2"></i>
+                        تمت المراجعة
+                        <span class="badge bg-success ms-auto">12</span>
+                    </a>
+                    <a class="nav-link" href="#rejected">
+                        <i class="fas fa-times-circle me-2"></i>
+                        مرفوضة
+                        <span class="badge bg-danger ms-auto">3</span>
+                    </a>
+                </nav>
+                
+                <div class="mt-4">
+                    <h6 class="fw-bold mb-3">فلترة</h6>
+                    <select class="form-select form-select-sm mb-2" id="programFilter">
+                        <option value="">جميع البرامج</option>
+                        <option value="incubator">الحاضنات</option>
+                        <option value="accelerator">المسرعات</option>
+                        <option value="grant">المنح</option>
+                    </select>
+                    
+                    <select class="form-select form-select-sm mb-2" id="sectorFilter">
+                        <option value="">جميع القطاعات</option>
+                        <option value="fintech">التكنولوجيا المالية</option>
+                        <option value="ecommerce">التجارة الإلكترونية</option>
+                        <option value="healthtech">التكنولوجيا الصحية</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Applications List -->
+        <div class="col-xl-10 col-lg-9">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold">
+                    <i class="fas fa-list me-2"></i>
+                    طلبات المراجعة
+                </h4>
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary btn-sm" onclick="sortApplications('date')">
+                        <i class="fas fa-sort-amount-down me-1"></i>ترتيب بالتاريخ
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm" onclick="sortApplications('priority')">
+                        <i class="fas fa-star me-1"></i>ترتيب بالأولوية
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Applications Cards -->
+            <div id="applicationsContainer">
+                <!-- Sample Application 1 -->
+                <div class="application-card mb-4" data-status="pending">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1">تطبيق التوصيل الذكي</h5>
+                                <div class="application-meta">
+                                    <span class="badge bg-primary me-2">برنامج نواتك الأساسي</span>
+                                    <span class="badge bg-info me-2">التكنولوجيا المالية</span>
+                                    <span class="text-muted small">
+                                        <i class="fas fa-calendar me-1"></i>تم التقديم: 15/09/2024
+                                    </span>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="badge bg-warning">في الانتظار</span>
+                                <div class="priority-indicator mt-1">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-muted"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6 class="fw-bold mb-2">ملخص الشركة:</h6>
+                                    <p class="text-muted mb-3">
+                                        منصة توصيل ذكية تستخدم الذكاء الاصطناعي لتحسين تجربة العملاء وتقليل أوقات التوصيل. 
+                                        نهدف لحل مشكلة التأخير في التوصيل في المدن العراقية.
+                                    </p>
+                                    
+                                    <div class="startup-info mb-3">
+                                        <div class="row">
+                                            <div class="col-sm-6 mb-2">
+                                                <i class="fas fa-user text-primary me-2"></i>
+                                                <strong>المؤسس:</strong> م. أحمد محمد
+                                            </div>
+                                            <div class="col-sm-6 mb-2">
+                                                <i class="fas fa-users text-success me-2"></i>
+                                                <strong>حجم الفريق:</strong> 4 أشخاص
+                                            </div>
+                                            <div class="col-sm-6 mb-2">
+                                                <i class="fas fa-map-marker-alt text-info me-2"></i>
+                                                <strong>المدينة:</strong> بغداد
+                                            </div>
+                                            <div class="col-sm-6 mb-2">
+                                                <i class="fas fa-chart-line text-warning me-2"></i>
+                                                <strong>المرحلة:</strong> نموذج أولي
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="review-actions">
+                                        <h6 class="fw-bold mb-3">ملفات الطلب:</h6>
+                                        <div class="files-list mb-3">
+                                            <a href="#" class="file-link d-block mb-2">
+                                                <i class="fas fa-file-pdf text-danger me-2"></i>
+                                                عرض المشروع.pdf
+                                            </a>
+                                            <a href="#" class="file-link d-block mb-2">
+                                                <i class="fas fa-file-excel text-success me-2"></i>
+                                                خطة العمل.xlsx
+                                            </a>
+                                            <a href="#" class="file-link d-block mb-2">
+                                                <i class="fas fa-file-pdf text-danger me-2"></i>
+                                                سيرة ذاتية.pdf
+                                            </a>
+                                        </div>
+                                        
+                                        <div class="action-buttons">
+                                            <button class="btn btn-success btn-sm w-100 mb-2" onclick="reviewApplication(1, 'accept')">
+                                                <i class="fas fa-check me-2"></i>قبول
+                                            </button>
+                                            <button class="btn btn-danger btn-sm w-100 mb-2" onclick="reviewApplication(1, 'reject')">
+                                                <i class="fas fa-times me-2"></i>رفض
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-sm w-100" onclick="openDetailedReview(1)">
+                                                <i class="fas fa-eye me-2"></i>مراجعة مفصلة
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sample Application 2 -->
+                <div class="application-card mb-4" data-status="pending">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1">منصة التعليم الذكي</h5>
+                                <div class="application-meta">
+                                    <span class="badge bg-secondary me-2">مسرعة الأعمال التقنية</span>
+                                    <span class="badge bg-info me-2">التكنولوجيا التعليمية</span>
+                                    <span class="text-muted small">
+                                        <i class="fas fa-calendar me-1"></i>تم التقديم: 14/09/2024
+                                    </span>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="badge bg-warning">في الانتظار</span>
+                                <div class="priority-indicator mt-1">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6 class="fw-bold mb-2">ملخص الشركة:</h6>
+                                    <p class="text-muted mb-3">
+                                        منصة تعليمية تفاعلية تستخدم تقنيات الواقع المعزز لتحسين تجربة التعلم للطلاب في المدارس العراقية.
+                                    </p>
+                                    
+                                    <div class="startup-info mb-3">
+                                        <div class="row">
+                                            <div class="col-sm-6 mb-2">
+                                                <i class="fas fa-user text-primary me-2"></i>
+                                                <strong>المؤسس:</strong> د. فاطمة علي
+                                            </div>
+                                            <div class="col-sm-6 mb-2">
+                                                <i class="fas fa-users text-success me-2"></i>
+                                                <strong>حجم الفريق:</strong> 6 أشخاص
+                                            </div>
+                                            <div class="col-sm-6 mb-2">
+                                                <i class="fas fa-map-marker-alt text-info me-2"></i>
+                                                <strong>المدينة:</strong> أربيل
+                                            </div>
+                                            <div class="col-sm-6 mb-2">
+                                                <i class="fas fa-chart-line text-warning me-2"></i>
+                                                <strong>المرحلة:</strong> نمو مبكر
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="review-actions">
+                                        <h6 class="fw-bold mb-3">ملفات الطلب:</h6>
+                                        <div class="files-list mb-3">
+                                            <a href="#" class="file-link d-block mb-2">
+                                                <i class="fas fa-file-pdf text-danger me-2"></i>
+                                                عرض المشروع.pdf
+                                            </a>
+                                            <a href="#" class="file-link d-block mb-2">
+                                                <i class="fas fa-file-pdf text-danger me-2"></i>
+                                                خطة العمل.pdf
+                                            </a>
+                                        </div>
+                                        
+                                        <div class="action-buttons">
+                                            <button class="btn btn-success btn-sm w-100 mb-2" onclick="reviewApplication(2, 'accept')">
+                                                <i class="fas fa-check me-2"></i>قبول
+                                            </button>
+                                            <button class="btn btn-danger btn-sm w-100 mb-2" onclick="reviewApplication(2, 'reject')">
+                                                <i class="fas fa-times me-2"></i>رفض
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-sm w-100" onclick="openDetailedReview(2)">
+                                                <i class="fas fa-eye me-2"></i>مراجعة مفصلة
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- No Applications Message -->
+            <div id="noApplicationsMessage" class="text-center py-5" style="display: none;">
+                <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">لا توجد طلبات في هذه الفئة</h5>
+                <p class="text-muted">سيتم عرض الطلبات الجديدة هنا عند وصولها</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Review Modal -->
+<div class="modal fade" id="detailedReviewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-microscope me-2"></i>
+                    مراجعة مفصلة للطلب
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <!-- Evaluation Form -->
+                        <form id="evaluationForm">
+                            <h6 class="fw-bold mb-3">معايير التقييم:</h6>
+                            
+                            <div class="evaluation-criteria mb-4">
+                                <div class="criterion mb-3">
+                                    <label class="form-label">قوة الفكرة والابتكار (1-10)</label>
+                                    <input type="range" class="form-range" min="1" max="10" value="5" id="innovation">
+                                    <div class="d-flex justify-content-between">
+                                        <small>ضعيف</small>
+                                        <small>ممتاز</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="criterion mb-3">
+                                    <label class="form-label">جودة الفريق (1-10)</label>
+                                    <input type="range" class="form-range" min="1" max="10" value="5" id="team">
+                                    <div class="d-flex justify-content-between">
+                                        <small>ضعيف</small>
+                                        <small>ممتاز</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="criterion mb-3">
+                                    <label class="form-label">إمكانية التنفيذ (1-10)</label>
+                                    <input type="range" class="form-range" min="1" max="10" value="5" id="feasibility">
+                                    <div class="d-flex justify-content-between">
+                                        <small>ضعيف</small>
+                                        <small>ممتاز</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="criterion mb-3">
+                                    <label class="form-label">حجم السوق المحتمل (1-10)</label>
+                                    <input type="range" class="form-range" min="1" max="10" value="5" id="market">
+                                    <div class="d-flex justify-content-between">
+                                        <small>ضعيف</small>
+                                        <small>ممتاز</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">ملاحظات المراجعة</label>
+                                <textarea class="form-control" rows="4" placeholder="أضف ملاحظاتك وتوصياتك هنا..."></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">التوصية النهائية</label>
+                                <select class="form-select">
+                                    <option value="">اختر التوصية</option>
+                                    <option value="accept">قبول بقوة</option>
+                                    <option value="accept_conditional">قبول مشروط</option>
+                                    <option value="reject">رفض</option>
+                                    <option value="resubmit">إعادة تقديم</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <!-- Application Summary -->
+                        <div class="application-summary">
+                            <h6 class="fw-bold mb-3">ملخص الطلب</h6>
+                            <div class="summary-item mb-2">
+                                <strong>اسم الشركة:</strong> تطبيق التوصيل الذكي
+                            </div>
+                            <div class="summary-item mb-2">
+                                <strong>المؤسس:</strong> م. أحمد محمد
+                            </div>
+                            <div class="summary-item mb-2">
+                                <strong>القطاع:</strong> التكنولوجيا المالية
+                            </div>
+                            <div class="summary-item mb-3">
+                                <strong>تاريخ التقديم:</strong> 15/09/2024
+                            </div>
+                            
+                            <div class="score-summary">
+                                <h6 class="fw-bold mb-2">النتيجة الإجمالية:</h6>
+                                <div class="score-display text-center">
+                                    <span class="score-number">0</span>/40
+                                    <div class="score-percentage">0%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary" onclick="submitReview()">
+                    <i class="fas fa-save me-2"></i>حفظ المراجعة
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.application-card {
+    transition: all 0.3s ease;
+}
+
+.application-card:hover {
+    transform: translateY(-2px);
+}
+
+.priority-indicator .fas {
+    font-size: 0.8rem;
+}
+
+.file-link {
+    text-decoration: none;
+    color: var(--dark);
+    padding: 0.25rem 0;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.file-link:hover {
+    background: rgba(26, 35, 126, 0.05);
+    color: var(--primary);
+}
+
+.evaluation-criteria .criterion {
+    padding: 1rem;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+.score-display {
+    padding: 1rem;
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: 8px;
+}
+
+.score-number {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.score-percentage {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+</style>
+
+<script>
+function reviewApplication(id, action) {
+    const actionText = action === 'accept' ? 'قبول' : 'رفض';
+    const confirmText = `هل أنت متأكد من ${actionText} هذا الطلب؟`;
+    
+    if (confirm(confirmText)) {
+        // Simulate API call
+        setTimeout(() => {
+            alert(`تم ${actionText} الطلب بنجاح! ✅`);
+            // Hide the application card
+            event.target.closest('.application-card').style.display = 'none';
+        }, 1000);
+    }
+}
+
+function openDetailedReview(id) {
+    const modal = new bootstrap.Modal(document.getElementById('detailedReviewModal'));
+    modal.show();
+    updateScore();
+}
+
+function updateScore() {
+    const ranges = document.querySelectorAll('#evaluationForm input[type="range"]');
+    const scoreDisplay = document.querySelector('.score-number');
+    const percentageDisplay = document.querySelector('.score-percentage');
+    
+    ranges.forEach(range => {
+        range.addEventListener('input', function() {
+            let total = 0;
+            ranges.forEach(r => total += parseInt(r.value));
+            
+            scoreDisplay.textContent = total;
+            percentageDisplay.textContent = Math.round((total / 40) * 100) + '%';
+        });
+    });
+}
+
+function submitReview() {
+    alert('تم حفظ المراجعة بنجاح! 📋');
+    bootstrap.Modal.getInstance(document.getElementById('detailedReviewModal')).hide();
+}
+
+function sortApplications(type) {
+    // Simulate sorting
+    alert(`تم ترتيب الطلبات حسب ${type === 'date' ? 'التاريخ' : 'الأولوية'}`);
+}
+
+// Filter functionality
+document.querySelectorAll('#programFilter, #sectorFilter').forEach(filter => {
+    filter.addEventListener('change', function() {
+        // Simulate filtering
+        console.log('Filtering by:', this.value);
+    });
+});
+</script>
+{% endblock %}

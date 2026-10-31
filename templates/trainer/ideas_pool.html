@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}الأفكار المتاحة للمراجعة{% endblock %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark"><i class="fas fa-search text-warning me-2"></i> تصفح الأفكار الجديدة</h2>
+        <a href="{{ url_for('trainer.dashboard') }}" class="btn btn-outline-secondary">العودة للوحة</a>
+    </div>
+
+    <div class="row g-4">
+        {% if applications %}
+            {% for app in applications %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm h-100 transition-all hover-up">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="badge bg-primary">{{ app.program.name }}</span>
+                            <span class="text-muted small">{{ app.created_at.strftime('%Y-%m-%d') }}</span>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">{{ app.startup.name }}</h5>
+                        <p class="text-muted small mb-3"><i class="fas fa-tag me-1"></i> {{ app.startup.sector }}</p>
+                        
+                        <!-- زر الانتقال للتفاصيل والتقييم ومصفوفة المخاطر -->
+                        <a href="{{ url_for('trainer.idea_details', app_id=app.id) }}" class="btn btn-dark w-100 mt-auto">
+                            <i class="fas fa-eye me-1"></i> فحص وتقييم الفكرة
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-check-circle fa-4x text-success mb-3 opacity-50"></i>
+                <h4 class="text-muted fw-bold">لا توجد أفكار جديدة في الوقت الحالي!</h4>
+            </div>
+        {% endif %}
+    </div>
+</div>
+<style>.hover-up:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }</style>
+{% endblock %}

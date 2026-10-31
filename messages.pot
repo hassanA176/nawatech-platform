@@ -1,0 +1,47 @@
+# Translations template for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-04-02 14:43+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: templates/base.html:634
+msgid "نـواتـك"
+msgstr ""
+
+#: templates/base.html:642
+msgid "الرئيسية"
+msgstr ""
+
+#: templates/base.html:644
+msgid "البرامج"
+msgstr ""
+
+#: templates/base.html:645
+msgid "خدماتنا"
+msgstr ""
+
+#: templates/base.html:647
+msgid "حول"
+msgstr ""
+
+#: templates/base.html:649
+msgid "تواصل"
+msgstr ""
+
+#: templates/admin/activity_logs.html:6
+msgid "سجل النشاطات - نواتك"
+msgstr ""
+

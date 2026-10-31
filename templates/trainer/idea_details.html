@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}تفاصيل وتقييم الفكرة{% endblock %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark"><i class="fas fa-project-diagram text-primary me-2"></i> ملف الفكرة: {{ app.startup.name }}</h2>
+        <a href="{{ url_for('trainer.ideas_pool') }}" class="btn btn-outline-secondary">العودة للقائمة</a>
+    </div>
+
+    <div class="row g-4">
+        <!-- قسم تفاصيل الشركة -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="fw-bold text-dark mb-0">بيانات المشروع الأساسية</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6"><span class="text-muted">القطاع:</span> <strong class="text-dark">{{ app.startup.sector }}</strong></div>
+                        <div class="col-md-6"><span class="text-muted">المدينة:</span> <strong class="text-dark">{{ app.startup.city }}</strong></div>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-danger fw-bold">المشكلة:</h6>
+                        <p class="bg-light p-3 rounded">{{ app.startup.problem }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-success fw-bold">الحل المقترح:</h6>
+                        <p class="bg-light p-3 rounded">{{ app.startup.solution }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- مصفوفة المخاطر (AI) -->
+            <div class="card border-0 shadow-sm border-top border-warning border-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold text-dark mb-0"><i class="fas fa-exclamation-triangle text-warning me-2"></i> مصفوفة تحليل المخاطر (AI)</h5>
+                    <span class="badge bg-dark">Nawatech AI</span>
+                </div>
+                <div class="card-body table-responsive">
+                    {% if app.startup.evaluation and app.startup.evaluation.risk_matrix %}
+                        {{ app.startup.evaluation.risk_matrix | safe }}
+                    {% else %}
+                        <div class="text-center text-muted py-4"><i class="fas fa-spinner fa-spin me-2"></i> جاري توليد المصفوفة...</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- قسم التقييم واتخاذ القرار -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4 bg-primary text-black">
+                <div class="card-body text-center py-4">
+                    <h6 class="mb-3"><i class="fas fa-robot me-2"></i>تقييم الذكاء الاصطناعي الأولي</h6>
+                    <h1 class="display-3 fw-bold mb-0">{{ app.startup.evaluation.total_score if app.startup.evaluation else '0' }}%</h1>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm border-top border-success border-4">
+                <div class="card-body">
+                    <h5 class="fw-bold text-dark mb-4 text-center">القرار النهائي للمدرب</h5>
+                    <form method="POST" action="{{ url_for('trainer.evaluate_idea', app_id=app.id) }}">
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark">إذا كنت ستقبل الفكرة، ما مدى أهميتها؟</label>
+                            <select name="importance" class="form-select border-2">
+                                <option value="normal" selected>فكرة عادية </option>
+                                <option value="medium">فكرة جيدة</option>
+                                <option value="high" class="fw-bold text-danger">فكرة غاية الاهمية  </option>
+                            </select>
+                            <small class="text-muted mt-1 d-block">الأفكار الـ VIP سيتم إرسالها للمستشارين لرؤيتها.</small>
+                        </div>
+
+                        <div class="d-grid gap-3">
+                            <button type="submit" name="action" value="accept" class="btn btn-success btn-lg fw-bold shadow">
+                                <i class="fas fa-check-circle me-2"></i> قبول الفكرة والتبني
+                            </button>
+                            <button type="submit" name="action" value="reject" class="btn btn-outline-danger fw-bold" onclick="return confirm('هل أنت متأكد من رفض الفكرة؟')">
+                                <i class="fas fa-times-circle me-2"></i> رفض الفكرة
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

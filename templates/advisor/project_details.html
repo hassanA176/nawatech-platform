@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}تفاصيل المشروع - المستشار{% endblock %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark"><i class="fas fa-search-dollar text-primary me-2"></i> فحص مشروع: {{ app.startup.name }}</h2>
+        <a href="{{ url_for('advisor.inbox') }}" class="btn btn-outline-secondary fw-bold">العودة للوحة</a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <!-- بيانات الفكرة الأساسية -->
+            <div class="card border-0 shadow-sm mb-4 border-top border-primary border-4">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold text-primary mb-3">ملخص الفكرة</h4>
+                    <p class="fs-5 text-dark bg-light p-3 rounded lh-lg">{{ app.startup.summary }}</p>
+                    <h6 class="fw-bold text-danger mt-4">المشكلة:</h6>
+                    <p class="text-dark">{{ app.startup.problem }}</p>
+                    <h6 class="fw-bold text-success mt-4">الحل المبتكر:</h6>
+                    <p class="text-dark">{{ app.startup.solution }}</p>
+                </div>
+            </div>
+
+            <!-- استمارة 1 -->
+            <div class="card border-0 shadow-sm mb-4 border-top border-info border-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="fw-bold text-info mb-0"><i class="fas fa-file-alt me-2"></i> استمارة 1 (احتياجات السوق)</h5>
+                </div>
+                <div class="card-body p-4">
+                    {% if form_one %}
+                        <h6 class="fw-bold text-dark bg-light p-2 rounded">إحتياجات الزبون (ماذا وأين ولمن؟)</h6>
+                        <p class="fs-5 text-dark ms-2" style="white-space: pre-wrap;">{{ form_one.customer_needs }}</p>
+                        <h6 class="fw-bold text-dark bg-light p-2 rounded mt-3">الهدف الأسمى للمشروع</h6>
+                        <p class="fs-5 text-dark ms-2" style="white-space: pre-wrap;">{{ form_one.ultimate_goal }}</p>
+                    {% else %}
+                        <p class="text-muted text-center">الرائد لم يقم بتعبئة الاستمارة بعد.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- مشروع التخرج النهائي -->
+            <div class="card border-0 shadow-sm mb-4 border-top border-dark border-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="fw-bold text-dark mb-0"><i class="fas fa-flag-checkered me-2"></i> مشروع التخرج النهائي (مخرجات التدريب)</h5>
+                </div>
+                <div class="card-body p-4">
+                    {% if app.final_project_file %}
+                        <a href="{{ url_for('static', filename=app.final_project_file) }}" target="_blank" class="btn btn-dark w-100 fw-bold py-3">
+                            <i class="fas fa-download me-2"></i> تحميل وقراءة الملف المرفق
+                        </a>
+                    {% elif app.final_project_text %}
+                        <div class="p-4 bg-light rounded-3 border text-dark fs-5" style="white-space: pre-wrap;">{{ app.final_project_text }}</div>
+                    {% else %}
+                        <p class="text-muted text-center">الرائد لم يقم برفع المشروع النهائي حتى الآن.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- مصفوفة المخاطر -->
+            <div class="card border-0 shadow-sm border-top border-warning border-4">
+                <div class="card-header bg-white py-3"><h5 class="fw-bold mb-0">مصفوفة المخاطر (محللة بواسطة الذكاء الاصطناعي)</h5></div>
+                <div class="card-body table-responsive">
+                    {{ app.startup.evaluation.risk_matrix | safe }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- تقييم الذكاء الاصطناعي -->
+            <div class="card border-0 shadow-sm mb-4 bg-dark text-black">
+                <div class="card-body text-center py-4">
+                    <h5 class="mb-3">ثقة الذكاء الاصطناعي بنجاح الفكرة</h5>
+                    {% set score = app.startup.evaluation.total_score %}
+                    {% if score >= 80 %}
+                        <h2 class="text-success fw-bold"><i class="fas fa-shield-alt me-2"></i> High Confidence</h2>
+                    {% elif score >= 50 %}
+                        <h2 class="text-warning fw-bold"><i class="fas fa-balance-scale me-2"></i> Medium Conf.</h2>
+                    {% else %}
+                        <h2 class="text-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> Low Confidence</h2>
+                    {% endif %}
+                    <p class="fs-1 fw-bold text-black mt-2">{{ score }}%</p>
+                </div>
+            </div>
+
+            <!-- معلومات إضافية -->
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-dark mb-3"><i class="fas fa-info-circle text-primary me-2"></i> معلومات المتابعة:</h6>
+                    <ul class="list-unstyled mb-0 lh-lg">
+                        <li><strong>الرائد:</strong> {{ app.startup.owner.full_name }}</li>
+                        <li><strong>المدينة:</strong> {{ app.startup.city }}</li>
+                        <li><strong>المدرب المشرف:</strong> {{ app.trainer.full_name if app.trainer else 'غير محدد' }}</li>
+                        <li><strong>حالة التخرج:</strong> 
+                            {% if app.is_graduated %}<span class="badge bg-success">متخرج</span>{% else %}<span class="badge bg-warning text-dark">قيد التدريب</span>{% endif %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

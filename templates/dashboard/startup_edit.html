@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}تعديل {{ startup.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">
+        <i class="fas fa-edit me-2 text-primary"></i>
+        تعديل بيانات الشركة: {{ startup.name }}
+    </h2>
+
+    <form method="POST" class="needs-validation" novalidate>
+        <!-- المعلومات الأساسية -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header custom-dark-header">
+                <h5 class="mb-0">المعلومات الأساسية</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="name" class="form-label">اسم الشركة *</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               value="{{ startup.name }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="sector" class="form-label">القطاع *</label>
+                        <select class="form-select" id="sector" name="sector" required>
+                            <option value="">اختر القطاع</option>
+                            {% set sectors = ['fintech', 'ecommerce', 'healthtech', 'edtech', 'agritech', 'logistics', 'renewable', 'other'] %}
+                            {% for s in sectors %}
+                            <option value="{{ s }}" {% if startup.sector == s %}selected{% endif %}>
+                                {% if s == 'fintech' %}التكنولوجيا المالية
+                                {% elif s == 'ecommerce' %}التجارة الإلكترونية
+                                {% elif s == 'healthtech' %}التكنولوجيا الصحية
+                                {% elif s == 'edtech' %}التكنولوجيا التعليمية
+                                {% elif s == 'agritech' %}التكنولوجيا الزراعية
+                                {% elif s == 'logistics' %}اللوجستيات
+                                {% elif s == 'renewable' %}الطاقة المتجددة
+                                {% else %}أخرى{% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="stage" class="form-label">مرحلة الشركة *</label>
+                        <select class="form-select" id="stage" name="stage" required>
+                            <option value="">اختر المرحلة</option>
+                            {% set stages = ['idea', 'prototype', 'mvp', 'early_traction', 'scaling'] %}
+                            {% for st in stages %}
+                            <option value="{{ st }}" {% if startup.stage == st %}selected{% endif %}>
+                                {% if st == 'idea' %}فكرة
+                                {% elif st == 'prototype' %}نموذج أولي
+                                {% elif st == 'mvp' %}الحد الأدنى للمنتج
+                                {% elif st == 'early_traction' %}نمو مبكر
+                                {% else %}توسع{% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="city" class="form-label">المدينة *</label>
+                        <select class="form-select" id="city" name="city" required>
+                            <option value="">اختر المدينة</option>
+                            {% set cities = ['بغداد', 'أربيل', 'البصرة', 'النجف', 'كربلاء', 'الموصل', 'السليمانية', 'أخرى'] %}
+                            {% for c in cities %}
+                            <option value="{{ c }}" {% if startup.city == c %}selected{% endif %}>{{ c }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="summary" class="form-label">ملخص المشروع *</label>
+                        <textarea class="form-control" id="summary" name="summary" rows="4" required>{{ startup.summary or '' }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- تفاصيل العمل -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header custom-dark-header">
+                <h5 class="mb-0">تفاصيل العمل</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="problem" class="form-label">المشكلة التي تحلها</label>
+                        <textarea class="form-control" id="problem" name="problem" rows="3">{{ startup.problem or '' }}</textarea>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="solution" class="form-label">الحل المقترح</label>
+                        <textarea class="form-control" id="solution" name="solution" rows="3">{{ startup.solution or '' }}</textarea>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="target_market" class="form-label">السوق المستهدف</label>
+                        <textarea class="form-control" id="target_market" name="target_market" rows="3">{{ startup.target_market or '' }}</textarea>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="business_model" class="form-label">نموذج العمل</label>
+                        <textarea class="form-control" id="business_model" name="business_model" rows="3">{{ startup.business_model or '' }}</textarea>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="competitive_advantage" class="form-label">الميزة التنافسية</label>
+                        <textarea class="form-control" id="competitive_advantage" name="competitive_advantage" rows="2">{{ startup.competitive_advantage or '' }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- معلومات الفريق -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header custom-dark-header">
+                <h5 class="mb-0">معلومات الفريق</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="team_size" class="form-label">حجم الفريق</label>
+                        <select class="form-select" id="team_size" name="team_size">
+                            <option value="">اختر حجم الفريق</option>
+                            {% set sizes = ['1', '2-3', '4-5', '6-10', '10+'] %}
+                            {% for sz in sizes %}
+                            <option value="{{ sz }}" {% if startup.team_size == sz %}selected{% endif %}>{{ sz }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="key_skills" class="form-label">المهارات الأساسية</label>
+                        <input type="text" class="form-control" id="key_skills" name="key_skills" 
+                               value="{{ startup.key_skills or '' }}">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="team_experience" class="form-label">خبرة الفريق</label>
+                        <textarea class="form-control" id="team_experience" name="team_experience" rows="3">{{ startup.team_experience or '' }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- المعلومات المالية -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header custom-dark-header">
+                <h5 class="mb-0">المعلومات المالية</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="funding_stage" class="form-label">مرحلة التمويل</label>
+                        <select class="form-select" id="funding_stage" name="funding_stage">
+                            <option value="">اختر مرحلة التمويل</option>
+                            {% set stages = ['bootstrapped', 'pre_seed', 'seed', 'series_a', 'series_b'] %}
+                            {% for st in stages %}
+                            <option value="{{ st }}" {% if startup.funding_stage == st %}selected{% endif %}>
+                                {% if st == 'bootstrapped' %}تمويل ذاتي
+                                {% elif st == 'pre_seed' %}ما قبل البذرة
+                                {% elif st == 'seed' %}البذرة
+                                {% elif st == 'series_a' %}السلسلة أ
+                                {% else %}السلسلة ب{% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="funding_amount" class="form-label">المبلغ المطلوب (دولار)</label>
+                        <input type="number" class="form-control" id="funding_amount" name="funding_amount" 
+                               value="{{ startup.funding_amount or '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="current_revenue" class="form-label">الإيرادات الحالية (شهرياً - دولار)</label>
+                        <input type="number" class="form-control" id="current_revenue" name="current_revenue" 
+                               value="{{ startup.current_revenue or '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="revenue_projection" class="form-label">توقعات الإيرادات (سنوياً - دولار)</label>
+                        <input type="number" class="form-control" id="revenue_projection" name="revenue_projection" 
+                               value="{{ startup.revenue_projection or '' }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- أزرار الحفظ والإلغاء -->
+        <div class="text-center mt-5 mb-5">
+            <button type="submit" class="btn btn-success btn-lg px-5 me-3">
+                <i class="fas fa-save me-2"></i> حفظ التعديلات
+            </button>
+            <a href="{{ url_for('dashboard.startup_detail', startup_id=startup.id) }}" 
+               class="btn btn-outline-secondary btn-lg px-5">
+                <i class="fas fa-times me-2"></i> إلغاء
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+// تفعيل التحقق من صحة النموذج (Bootstrap)
+(function () {
+  'use strict'
+  var forms = document.querySelectorAll('.needs-validation')
+  Array.prototype.slice.call(forms).forEach(function (form) {
+    form.addEventListener('submit', function (event) {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script>
+
+<style>
+    .custom-dark-header {
+        background-color: #0f0f0f;      /* أسود غامق جدًا */
+        color: #000000 !important;      /* النص الرئيسي (العنوان) أسود */
+        border-bottom: 1px solid #222;
+    }
+    
+    .custom-dark-header h5 {
+        color: #000000 !important;      /* نضمن أن h5 أسود أيضًا */
+    }
+</style>
+{% endblock %}

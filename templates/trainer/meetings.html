@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}إدارة الاجتماعات{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold"><i class="fas fa-video text-danger me-2"></i> طلبات جلسات الإرشاد الرقمي</h2>
+        <a href="{{ url_for('trainer.dashboard') }}" class="btn btn-outline-secondary">العودة</a>
+    </div>
+
+    <div class="row">
+        {% if meetings %}
+            {% for m in meetings %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm h-100 {{ 'border-danger border-2' if m.status == 'pending' else 'border-success' }}">
+                    <div class="card-body">
+                        <h5 class="fw-bold text-primary">{{ m.application.startup.name }}</h5>
+                        <p class="text-muted small border-bottom pb-2">الرائد: {{ m.application.startup.owner.full_name }}</p>
+                        
+                        <div class="mb-3 bg-light p-3 rounded text-center">
+                            <h6 class="fw-bold text-dark"><i class="fas fa-calendar-alt text-info me-1"></i> الموعد المطلوب:</h6>
+                            <span class="fs-5 text-danger fw-bold">{{ m.requested_date }} | {{ m.requested_time }}</span>
+                        </div>
+
+                        {% if m.status == 'pending' %}
+                        <form method="POST" class="mt-3">
+                            <input type="hidden" name="meeting_id" value="{{ m.id }}">
+                            <button type="submit" name="action" value="approve" class="btn btn-success w-100 fw-bold mb-2">موافقة على الموعد</button>
+                            
+                            <hr>
+                            <label class="small text-muted mb-1">اقتراح موعد آخر:</label>
+                            <div class="input-group input-group-sm mb-2">
+                                <input type="date" name="new_date" class="form-control">
+                                <input type="time" name="new_time" class="form-control">
+                            </div>
+                            <button type="submit" name="action" value="reschedule" class="btn btn-outline-danger btn-sm w-100">تغيير الموعد</button>
+                        </form>
+                        {% else %}
+                            <div class="alert alert-success text-center fw-bold p-2 mb-3">تمت الموافقة ✓</div>
+                            <a href="{{ url_for('dashboard.live_room', room_name=m.room_name) }}" target="_blank" class="btn btn-danger w-100 fw-bold"><i class="fas fa-video me-1"></i> دخول غرفة الاجتماع</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-calendar-check fa-4x text-muted opacity-25 mb-3"></i>
+                <h4 class="text-muted">لا توجد طلبات اجتماعات حالياً.</h4>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

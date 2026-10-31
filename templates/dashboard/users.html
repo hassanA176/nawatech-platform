@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+
+{% block title %}إدارة المستخدمين - نواتك{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Admin Sidebar -->
+        <div class="col-xl-2 col-lg-3">
+            <div class="sidebar">
+                <div class="sidebar-header mb-4">
+                    <h5 class="fw-bold text-primary mb-0">
+                        <i class="fas fa-crown me-2"></i>
+                        لوحة الإدارة
+                    </h5>
+                </div>
+                
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{{ url_for('dashboard.index') }}">
+                        <i class="fas fa-chart-pie me-2"></i>نظرة عامة
+                    </a>
+                    <a class="nav-link active" href="{{ url_for('dashboard.manage_users') }}">
+                        <i class="fas fa-users me-2"></i>إدارة المستخدمين
+                    </a>
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-graduation-cap me-2"></i>إدارة البرامج
+                    </a>
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-building me-2"></i>الشركات الناشئة
+                    </a>
+                    <a class="nav-link" href="{{ url_for('dashboard.reports') }}">
+                        <i class="fas fa-chart-bar me-2"></i>التقارير
+                    </a>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-xl-10 col-lg-9">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold">
+                    <i class="fas fa-users me-2"></i>
+                    إدارة المستخدمين
+                </h4>
+                <button class="btn btn-primary" onclick="showAddUserModal()">
+                    <i class="fas fa-plus me-2"></i>إضافة مستخدم جديد
+                </button>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card text-center">
+                        <div class="stats-icon" style="background: var(--gradient-primary);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4 class="fw-bold text-primary mb-1">4</h4>
+                        <p class="text-muted mb-0">إجمالي المستخدمين</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card text-center">
+                        <div class="stats-icon" style="background: var(--gradient-secondary);">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h4 class="fw-bold text-primary mb-1">1</h4>
+                        <p class="text-muted mb-0">رواد أعمال</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card text-center">
+                        <div class="stats-icon" style="background: var(--gradient-accent);">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h4 class="fw-bold text-primary mb-1">1</h4>
+                        <p class="text-muted mb-0">مستشارين</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card text-center">
+                        <div class="stats-icon" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h4 class="fw-bold text-primary mb-1">1</h4>
+                        <p class="text-muted mb-0">مدربين</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" class="form-control" placeholder="البحث عن مستخدم..." id="searchInput">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="roleFilter" onchange="filterUsers()">
+                                <option value="">جميع الأدوار</option>
+                                <option value="Admin">مدير</option>
+                                <option value="Founder">رائد أعمال</option>
+                                <option value="Advisor">مستشار</option>
+                                <option value="Trainer">مدرب</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="statusFilter" onchange="filterUsers()">
+                                <option value="">جميع الحالات</option>
+                                <option value="active">نشط</option>
+                                <option value="inactive">غير نشط</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-secondary w-100" onclick="exportUsers()">
+                                <i class="fas fa-download me-1"></i>تصدير
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Users Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>المستخدم</th>
+                                    <th>الدور</th>
+                                    <th>البريد الإلكتروني</th>
+                                    <th>تاريخ التسجيل</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Demo Users -->
+                                <tr class="user-row" data-role="Admin" data-status="active">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar bg-gradient-primary text-white me-3" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                د.ع
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">د. عمر الإداري</div>
+                                                <small class="text-muted">المدير التنفيذي</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-crown me-1"></i>مدير
+                                        </span>
+                                    </td>
+                                    <td>admin@rafidain.com</td>
+                                    <td>15/09/2024</td>
+                                    <td>
+                                        <span class="badge bg-success">نشط</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="editUser(1)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="viewUser(1)">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="toggleUserStatus(1)">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="user-row" data-role="Founder" data-status="active">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar bg-gradient-secondary text-white me-3" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                م.أ
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">م. أحمد محمد</div>
+                                                <small class="text-muted">رائد أعمال</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">
+                                            <i class="fas fa-rocket me-1"></i>رائد أعمال
+                                        </span>
+                                    </td>
+                                    <td>founder@rafidain.com</td>
+                                    <td>15/09/2024</td>
+                                    <td>
+                                        <span class="badge bg-success">نشط</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="editUser(2)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="viewUser(2)">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="toggleUserStatus(2)">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="user-row" data-role="Advisor" data-status="active">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar bg-gradient-accent text-white me-3" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                د.س
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">د. سارة أحمد</div>
+                                                <small class="text-muted">مستشارة أعمال</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-user-tie me-1"></i>مستشار
+                                        </span>
+                                    </td>
+                                    <td>advisor@rafidain.com</td>
+                                    <td>15/09/2024</td>
+                                    <td>
+                                        <span class="badge bg-success">نشط</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="editUser(3)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="viewUser(3)">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="toggleUserStatus(3)">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="user-row" data-role="Trainer" data-status="active">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar bg-gradient text-white me-3" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                أ.م
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">أ. محمد علي</div>
+                                                <small class="text-muted">مدرب معتمد</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">
+                                            <i class="fas fa-chalkboard-teacher me-1"></i>مدرب
+                                        </span>
+                                    </td>
+                                    <td>trainer@rafidain.com</td>
+                                    <td>15/09/2024</td>
+                                    <td>
+                                        <span class="badge bg-success">نشط</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="editUser(4)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="viewUser(4)">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="toggleUserStatus(4)">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-plus me-2"></i>
+                    إضافة مستخدم جديد
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">الاسم الكامل *</label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">البريد الإلكتروني *</label>
+                            <input type="email" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">كلمة المرور *</label>
+                            <input type="password" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">الدور *</label>
+                            <select class="form-select" required>
+                                <option value="">اختر الدور</option>
+                                <option value="Founder">رائد أعمال</option>
+                                <option value="Advisor">مستشار</option>
+                                <option value="Trainer">مدرب</option>
+                                <option value="Admin">مدير</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">رقم الهاتف</label>
+                        <input type="tel" class="form-control">
+                    </div>
+                    
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="activeUser" checked>
+                        <label class="form-check-label" for="activeUser">
+                            تفعيل الحساب فوراً
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary" onclick="addUser()">
+                    <i class="fas fa-save me-2"></i>حفظ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.user-row {
+    transition: all 0.3s ease;
+}
+
+.user-row:hover {
+    background: rgba(26, 35, 126, 0.02);
+}
+
+.btn-group .btn {
+    margin: 0 1px;
+}
+</style>
+
+<script>
+function showAddUserModal() {
+    const modal = new bootstrap.Modal(document.getElementById('addUserModal'));
+    modal.show();
+}
+
+function addUser() {
+    alert('تم إضافة المستخدم بنجاح! ✅');
+    bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+}
+
+function editUser(id) {
+    alert(`تعديل المستخدم رقم ${id}`);
+}
+
+function viewUser(id) {
+    alert(`عرض تفاصيل المستخدم رقم ${id}`);
+}
+
+function toggleUserStatus(id) {
+    if (confirm('هل أنت متأكد من تغيير حالة هذا المستخدم؟')) {
+        alert('تم تغيير حالة المستخدم');
+    }
+}
+
+function filterUsers() {
+    const roleFilter = document.getElementById('roleFilter').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+    const rows = document.querySelectorAll('.user-row');
+    
+    rows.forEach(row => {
+        const role = row.dataset.role;
+        const status = row.dataset.status;
+        
+        const roleMatch = !roleFilter || role === roleFilter;
+        const statusMatch = !statusFilter || status === statusFilter;
+        
+        row.style.display = roleMatch && statusMatch ? '' : 'none';
+    });
+}
+
+function exportUsers() {
+    alert('تم تصدير بيانات المستخدمين! 📊');
+}
+
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.user-row');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,519 @@
+{% extends "base.html" %}
+
+{% block title %}إنشاء الفكرة والنموذج الأولي - نواتك{% endblock %}
+
+{% block content %}
+
+<!-- استدعاء مكتبة Quill.js للمحرر النصي -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<div class="container-fluid mt-4 mb-5">
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <div class="col-xl-2 col-lg-3 d-none d-lg-block">
+            <div class="sidebar sticky-top" style="top: 100px; z-index: 1000;">
+                <h5 class="fw-bold text-primary mb-3">
+                    <i class="fas fa-layer-group me-2"></i>
+                    مراحل الإنشاء
+                </h5>
+                <nav class="nav flex-column" id="scroll-spy-nav">
+                    <a class="nav-link active mb-2 rounded p-2" href="#section-idea" style="background-color: #e3f2fd; color: #0d6efd;">
+                        <i class="fas fa-lightbulb me-2"></i>1. الفكرة الأساسية
+                    </a>
+                    <a class="nav-link mb-2 rounded p-2 text-dark" href="#section-market">
+                        <i class="fas fa-chart-line me-2"></i>2. ملخص السوق
+                    </a>
+                    <a class="nav-link mb-2 rounded p-2 text-dark" href="#section-prototype">
+                        <i class="fas fa-desktop me-2"></i>3. النموذج الأولي
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Form Content -->
+        <div class="col-xl-10 col-lg-9">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-primary">بناء المشروع والنموذج الأولي</h2>
+                <p class="text-muted">أكمل البيانات التالية وسيقوم الذكاء الاصطناعي بتقييم جدوى الفكرة.</p>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" id="startupForm">
+                
+                <!-- 1. Basic Idea Information -->
+                <div id="section-idea" class="card shadow-sm mb-4 border-0">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h5 class="mb-0 text-primary fw-bold"><i class="fas fa-info-circle me-2"></i>1. معلومات الفكرة الأساسية</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">اسم المشروع *</label>
+                                <input type="text" class="form-control form-control-lg" name="name" required placeholder="مثال: نواتك">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">القطاع *</label>
+                                <select class="form-select form-select-lg" name="sector" required>
+                                    <option value="" selected disabled>اختر...</option>
+                                    <option value="Fintech">تقنية مالية</option>
+                                    <option value="Ecommerce">تجارة إلكترونية</option>
+                                    <option value="Healthtech">صحة</option>
+                                    <option value="Edtech">تعليم</option>
+                                    <option value="Other">أخرى</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">المدينة *</label>
+                                <select class="form-select form-select-lg" name="city" required>
+                                    <option value="Baghdad">بغداد</option>
+                                    <option value="Erbil">أربيل</option>
+                                    <option value="Basra">البصرة</option>
+                                    <option value="Other">أخرى</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label fw-bold">المشكلة (The Problem) *</label>
+                                <textarea class="form-control" name="problem" rows="2" required placeholder="ما هي المشكلة التي تحلها؟"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">الحل (The Solution) *</label>
+                                <textarea class="form-control" name="solution" rows="2" required placeholder="كيف ستحل المشكلة؟"></textarea>
+                            </div>
+
+                            <!-- حقل مخفي لتخزين نوع النموذج (سيتم تحديثه عبر JS) -->
+                            <input type="hidden" name="prototype_type" id="prototypeTypeInput" value="builder">
+                            <!-- حقل مخفي لبيانات الشرائح -->
+                            <input type="hidden" name="prototype_data" id="prototypeDataInput">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Target Market Summary -->
+                <div id="section-market" class="card shadow-sm mb-4 border-0">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h5 class="mb-0 text-primary fw-bold"><i class="fas fa-chart-pie me-2"></i>2. ملخص السوق المستهدف</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">السوق المستهدف *</label>
+                                <input type="text" class="form-control" name="target_market" required placeholder="من هم العملاء؟">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">نبذة مختصرة (Elevator Pitch) *</label>
+                                <textarea class="form-control" name="summary" rows="2" required placeholder="جملة تصف المشروع باختصار."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Prototype (Builder OR Upload) -->
+                <div id="section-prototype" class="card shadow-sm mb-4 border-0">
+                    <!-- Header Black as requested -->
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h5 class="mb-0 text-primary fw-bold"><i class="fas fa-chalkboard me-2"></i>3.من فضلك قم ببناء النموذج الأولي او قم برفعه الي المنصة </h5>
+                    </div>
+                    
+                    <div class="card-body p-0 bg-light">
+                        <!-- Switcher: Builder vs Upload -->
+                        <div class="p-3 bg-white border-bottom text-center">
+                            <h6 class="mb-3 text-muted">كيف تريد تقديم ملف العرض الأولي؟</h6>
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="prototype_mode" id="mode_builder" autocomplete="off" checked onchange="togglePrototypeMode('builder')">
+                                <label class="btn btn-outline-dark px-4" for="mode_builder">
+                                    <i class="fas fa-pen-nib me-2"></i>إنشاء باستخدام المنصة
+                                </label>
+
+                                <input type="radio" class="btn-check" name="prototype_mode" id="mode_upload" autocomplete="off" onchange="togglePrototypeMode('upload')">
+                                <label class="btn btn-outline-dark px-4" for="mode_upload">
+                                    <i class="fas fa-upload me-2"></i>رفع ملف جاهز (PDF/PPT)
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- PANEL A: BUILDER (Default) -->
+                        <div id="builder-panel" class="animate-fade-in">
+                            <!-- Toolbar -->
+                            <div class="builder-toolbar p-3 bg-white border-bottom d-flex justify-content-between flex-wrap gap-2 sticky-top" style="z-index: 900;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="button" class="btn btn-success btn-sm" onclick="addNewSlide()">
+                                        <i class="fas fa-plus me-1"></i> شريحة جديدة
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteCurrentSlide()">
+                                        <i class="fas fa-trash"></i> حذف
+                                    </button>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <label class="small fw-bold text-muted">القالب:</label>
+                                    <select class="form-select form-select-sm" id="templateSelect" onchange="changeTemplate()" style="width: 150px;">
+                                        <option value="modern-blue">أزرق حديث</option>
+                                        <option value="minimal-dark">داكن بسيط</option>
+                                        <option value="creative-orange">برتقالي إبداعي</option>
+                                        <option value="professional-gray">رمادي رسمي</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-secondary" id="slideCounter">شريحة 1 من 1</span>
+                                </div>
+                            </div>
+
+                            <!-- Workspace -->
+                            <div class="builder-workspace p-4 d-flex justify-content-center align-items-start" style="min-height: 500px; overflow-x: auto; background-color: #f8f9fa;">
+                                <button type="button" class="btn btn-light rounded-circle shadow-sm align-self-center me-3" onclick="prevSlide()">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+
+                                <div class="slide-canvas shadow-lg modern-blue" id="currentSlide">
+                                    <div class="slide-header mb-3">
+                                        <input type="text" class="slide-title-input" id="slideTitle" placeholder="أدخل عنوان الشريحة هنا..." oninput="updateSlideData()">
+                                    </div>
+                                    <div class="slide-body mb-3">
+                                        <div id="editor-container" style="height: 200px; background: white;"></div>
+                                    </div>
+                                    <div class="slide-footer mt-auto pt-3 border-top border-light d-flex justify-content-between align-items-center">
+                                        <div class="image-upload-wrapper">
+                                            <label class="btn btn-outline-secondary btn-sm" for="slideImageUpload">
+                                                <i class="fas fa-image me-1"></i> إضافة صورة
+                                            </label>
+                                            <input type="file" id="slideImageUpload" accept="image/*" hidden onchange="handleImageUpload(this)">
+                                        </div>
+                                        <div id="imagePreviewArea" class="ms-2"></div>
+                                    </div>
+                                </div>
+
+                                <button type="button" class="btn btn-light rounded-circle shadow-sm align-self-center ms-3" onclick="nextSlide()">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- PANEL B: UPLOAD (Hidden by default) -->
+                        <div id="upload-panel" style="display: none;" class="p-5 animate-fade-in text-center">
+                            <div class="upload-zone border-2 border-dashed rounded-3 bg-white p-5 mx-auto" style="max-width: 600px;">
+                                <i class="fas fa-cloud-upload-alt fa-4x text-muted mb-3"></i>
+                                <h5>رفع ملف العرض التقديمي</h5>
+                                <p class="text-muted mb-4">يمكنك رفع ملف جاهز بصيغة PDF أو PowerPoint</p>
+                                <input class="form-control" type="file" name="prototype_file" accept=".pdf,.ppt,.pptx">
+                                <small class="text-muted d-block mt-3">الحد الأقصى: 15 ميجابايت</small>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-5">
+                    <button type="button" class="btn btn-outline-secondary px-4 me-md-2" onclick="window.history.back()">إلغاء</button>
+                    <button type="submit" id="submitBtn" class="btn btn-primary btn-lg px-5 shadow">
+                        <i class="fas fa-wand-magic-sparkles me-2"></i>إنشاء وحفظ المشروع
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ================= AI RESULT MODAL ================= -->
+<div class="modal fade" id="aiResultModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-gradient-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-brain me-2"></i>تحليل الذكاء الاصطناعي للفكرة</h5>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <div class="display-3 fw-bold text-primary" id="totalScoreDisplay">0%</div>
+                    <p class="text-muted">جدوى الفكرة الأولية</p>
+                </div>
+                <!-- Progress Bars -->
+                <div class="row g-4 mb-3">
+                    <div class="col-md-6">
+                        <small class="fw-bold">وضوح المشكلة</small>
+                        <div class="progress" style="height: 8px;"><div id="ideaScoreBar" class="progress-bar bg-success" style="width: 0%"></div></div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="fw-bold">منطقية الحل</small>
+                        <div class="progress" style="height: 8px;"><div id="techScoreBar" class="progress-bar bg-info" style="width: 0%"></div></div>
+                    </div>
+                </div>
+                <!-- Analysis -->
+                <div class="alert alert-light border-primary border-start border-4">
+                    <h6 class="fw-bold text-primary">التحليل:</h6>
+                    <p id="analysisText" class="mb-0 text-muted">...</p>
+                </div>
+                <div class="alert alert-warning border-warning border-start border-4">
+                    <h6 class="fw-bold text-warning-emphasis">التوصية:</h6>
+                    <span class="badge bg-warning text-dark" id="recommendationBadge">--</span>
+                </div>
+                <div class="text-center mt-3 text-muted small">
+                    <i class="fas fa-check-circle me-1"></i>تم حفظ الملف بنجاح.
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-primary px-5" onclick="redirectToDashboard()">الانتقال للوحة التحكم</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quill Library Script -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+<style>
+    /* Builder Styles */
+    .slide-canvas {
+        width: 100%;
+        max-width: 800px;
+        min-height: 450px;
+        background: white;
+        border-radius: 8px;
+        padding: 40px;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    /* Template Themes */
+    .modern-blue { border-top: 10px solid #0d6efd; background: linear-gradient(to bottom right, #ffffff, #f0f8ff); }
+    .modern-blue .slide-title-input { color: #0d6efd; }
+    
+    .minimal-dark { border-top: 10px solid #212529; background: #f8f9fa; }
+    .minimal-dark .slide-title-input { color: #212529; }
+
+    .creative-orange { border-top: 10px solid #fd7e14; background: linear-gradient(to bottom right, #fff, #fff5eb); }
+    .creative-orange .slide-title-input { color: #fd7e14; font-family: 'Tahoma', sans-serif; }
+
+    .professional-gray { border-top: 10px solid #6c757d; border-bottom: 5px solid #6c757d; }
+    
+    .slide-title-input {
+        width: 100%;
+        border: none;
+        border-bottom: 2px dashed #ddd;
+        font-size: 1.8rem;
+        font-weight: bold;
+        padding: 10px 0;
+        background: transparent;
+        margin-bottom: 20px;
+    }
+    .slide-title-input:focus { outline: none; border-bottom-color: var(--bs-primary); }
+
+    .img-preview-thumb {
+        height: 50px;
+        width: auto;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
+
+    .upload-zone {
+        transition: border-color 0.3s ease;
+    }
+    .upload-zone:hover {
+        border-color: var(--bs-primary) !important;
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.4s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>
+
+<script>
+    // === Presentation Builder Logic ===
+    
+    // 1. Initialize Quill Editor
+    var quill = new Quill('#editor-container', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, false] }],
+                ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'color': [] }, { 'background': [] }],
+                ['clean']
+            ]
+        },
+        placeholder: 'اكتب محتوى الشريحة هنا...'
+    });
+
+    // 2. Data Structure
+    let slides = [
+        { id: 1, title: 'المقدمة', content: '', image: null }
+    ];
+    let currentIndex = 0;
+
+    // 3. Slide Functions
+    function updateUI() {
+        document.getElementById('slideCounter').innerText = `شريحة ${currentIndex + 1} من ${slides.length}`;
+        const currentSlide = slides[currentIndex];
+        document.getElementById('slideTitle').value = currentSlide.title;
+        quill.root.innerHTML = currentSlide.content || '';
+        
+        const imgArea = document.getElementById('imagePreviewArea');
+        imgArea.innerHTML = currentSlide.image 
+            ? `<img src="${currentSlide.image}" class="img-preview-thumb" title="صورة مرفقة"> <button type="button" class="btn-close btn-sm" onclick="removeImage()"></button>` 
+            : '';
+    }
+
+    function saveCurrentState() {
+        slides[currentIndex].title = document.getElementById('slideTitle').value;
+        slides[currentIndex].content = quill.root.innerHTML;
+    }
+
+    function addNewSlide() {
+        saveCurrentState();
+        slides.push({ id: Date.now(), title: '', content: '', image: null });
+        currentIndex = slides.length - 1;
+        updateUI();
+    }
+
+    function deleteCurrentSlide() {
+        if (slides.length <= 1) {
+            alert("لا يمكن حذف الشريحة الأخيرة.");
+            return;
+        }
+        if(confirm("هل أنت متأكد من حذف هذه الشريحة؟")) {
+            slides.splice(currentIndex, 1);
+            if (currentIndex >= slides.length) currentIndex = slides.length - 1;
+            updateUI();
+        }
+    }
+
+    function nextSlide() {
+        saveCurrentState();
+        if (currentIndex < slides.length - 1) {
+            currentIndex++;
+            updateUI();
+        } else {
+            alert("هذه هي الشريحة الأخيرة.");
+        }
+    }
+
+    function prevSlide() {
+        saveCurrentState();
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateUI();
+        }
+    }
+
+    function changeTemplate() {
+        const theme = document.getElementById('templateSelect').value;
+        const canvas = document.getElementById('currentSlide');
+        canvas.classList.remove('modern-blue', 'minimal-dark', 'creative-orange', 'professional-gray');
+        canvas.classList.add(theme);
+    }
+
+    function handleImageUpload(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                slides[currentIndex].image = e.target.result; 
+                updateUI();
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function removeImage() {
+        slides[currentIndex].image = null;
+        updateUI();
+        document.getElementById('slideImageUpload').value = '';
+    }
+
+    // Live Listeners
+    quill.on('text-change', function() { slides[currentIndex].content = quill.root.innerHTML; });
+    document.getElementById('slideTitle').addEventListener('input', function() { slides[currentIndex].title = this.value; });
+
+    // === TOGGLE MODE: Builder vs Upload ===
+    function togglePrototypeMode(mode) {
+        const builderPanel = document.getElementById('builder-panel');
+        const uploadPanel = document.getElementById('upload-panel');
+        const typeInput = document.getElementById('prototypeTypeInput');
+
+        if (mode === 'builder') {
+            builderPanel.style.display = 'block';
+            uploadPanel.style.display = 'none';
+            typeInput.value = 'builder';
+        } else {
+            builderPanel.style.display = 'none';
+            uploadPanel.style.display = 'block';
+            typeInput.value = 'upload';
+        }
+    }
+
+    // === Form Submission Logic ===
+    document.getElementById('startupForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        saveCurrentState(); 
+
+        const submitBtn = document.getElementById('submitBtn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الحفظ والتحليل...';
+        submitBtn.disabled = true;
+
+        try {
+            // Check Mode
+            const mode = document.getElementById('prototypeTypeInput').value;
+            
+            if (mode === 'builder') {
+                const slidesJSON = JSON.stringify({
+                    template: document.getElementById('templateSelect').value,
+                    slides: slides
+                });
+                document.getElementById('prototypeDataInput').value = slidesJSON;
+            }
+
+            // Send Request
+            const formData = new FormData(this);
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (response.ok && data.status === 'success') {
+                // Populate AI Modal
+                document.getElementById('totalScoreDisplay').innerText = data.total_score + '%';
+                
+                const ev = data.evaluation;
+                updateBar('ideaScore', ev.idea_score);
+                updateBar('techScore', ev.tech_score);
+                
+                document.getElementById('analysisText').innerText = ev.analysis_summary;
+                document.getElementById('recommendationBadge').innerText = ev.recommendation;
+                
+                const myModal = new bootstrap.Modal(document.getElementById('aiResultModal'));
+                myModal.show();
+            } else {
+                alert(data.message || 'Error');
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert('خطأ في الاتصال');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+
+    function updateBar(idPrefix, score) {
+        const pct = (score / 25) * 100;
+        const bar = document.getElementById(idPrefix + 'Bar');
+        if(bar) bar.style.width = pct + '%';
+    }
+
+    function redirectToDashboard() {
+        window.location.href = '{{ url_for("dashboard.index") }}';
+    }
+
+    // Initialize
+    updateUI();
+</script>
+
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}شروط الخدمة - نواتك{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5" style="background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);">
+    <div class="container text-center pt-5 pb-3">
+        <i class="fas fa-file-contract fa-4x text-warning mb-3"></i>
+        <h1 class="display-5 fw-bold text-black mb-2">شروط الخدمة</h1>
+        <p class="lead text-white-50 mb-0">Terms of Service</p>
+    </div>
+</section>
+
+<!-- Content Section -->
+<section class="py-5 bg-light">
+    <div class="container mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-0 shadow-lg rounded-4 border-top border-warning border-4">
+                    <!-- اتجاه النص LTR لأن البنود القانونية بالإنجليزية -->
+                    <div class="card-body p-4 p-md-5" dir="ltr" style="text-align: left;">
+                        
+                        <div class="mb-5">
+                            <h5 class="fw-bold text-dark mb-3">1. Introduction</h5>
+                            <p class="fs-5 text-muted lh-lg">
+                                By using the <strong class="text-dark">Nawatech</strong> platform and services, you agree to these terms. Nawatech is a brand owned and operated by <strong class="text-dark">BUTTERBOOK SDN BHD</strong> (Company No: 1269691-M), a company registered in Malaysia.
+                            </p>
+                        </div>
+                        
+                        <div class="mb-4 bg-white p-4 rounded-3 border shadow-sm hover-lift">
+                            <h5 class="fw-bold text-primary mb-3"><i class="fas fa-briefcase me-2"></i> 2. Description of Services</h5>
+                            <p class="text-muted mb-2">Nawatech provides an integrated suite of services, including but not limited to:</p>
+                            <ul class="text-muted mb-0">
+                                <li>Business Management Consultancy</li>
+                                <li>Professional Training & Educational Workshops</li>
+                                <li>Access to Digital Incubation Tools and Software Licensing</li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4 bg-white p-4 rounded-3 border shadow-sm hover-lift">
+                            <h5 class="fw-bold text-success mb-3"><i class="fas fa-tools me-2"></i> 3. Development Phase</h5>
+                            <p class="text-muted mb-0">Users acknowledge that the platform is in a continuous state of development. Funds collected are utilized to enhance the technical infrastructure, expand the service catalog, and support the R&D mission of the Nawatech ecosystem.</p>
+                        </div>
+
+                        <div class="mb-4 bg-white p-4 rounded-3 border shadow-sm hover-lift">
+                            <h5 class="fw-bold text-danger mb-3"><i class="fas fa-user-check me-2"></i> 4. User Obligations</h5>
+                            <p class="text-muted mb-0">Users agree to provide accurate information for billing and compliance purposes, particularly for international transactions processed via Stripe.</p>
+                        </div>
+
+                        <div class="mb-5 bg-white p-4 rounded-3 border shadow-sm hover-lift border-start border-warning border-4">
+                            <h5 class="fw-bold text-dark mb-3"><i class="fas fa-balance-scale text-warning me-2"></i> 5. Governing Law</h5>
+                            <p class="text-muted mb-0">These terms are governed by the Laws of Malaysia. Any legal proceedings shall be conducted within the jurisdiction of the Malaysian courts.</p>
+                        </div>
+
+                        <hr class="my-4">
+                        
+                        <!-- Contact Info -->
+                        <div class="bg-warning bg-opacity-10 p-4 rounded-4 text-center mt-4">
+                            <h6 class="fw-bold text-dark mb-2">For inquiries, please contact us at:</h6>
+                            <a href="mailto:info@nawatech.org" class="fs-5 fw-bold text-primary text-decoration-none">
+                                <i class="fas fa-envelope me-2"></i>info@nawatech.org
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.10)!important; }
+</style>
+{% endblock %}

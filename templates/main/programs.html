@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+
+{% block title %}البرامج المتاحة - نواتك{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <div class="hero-content">
+                    <h1 class="display-4 fw-bold mb-4">برامجنا المتاحة</h1>
+                    <p class="lead mb-0">اختر البرنامج المناسب لمرحلة مشروعك ونوع الدعم الذي تحتاجه</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Filter Section -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="filters d-flex flex-wrap gap-3">
+                    <button class="btn btn-outline-primary active" onclick="filterPrograms('all')">
+                        <i class="fas fa-th me-2"></i>جميع البرامج
+                    </button>
+                    <button class="btn btn-outline-success" onclick="filterPrograms('incubator')">
+                        <i class="fas fa-seedling me-2"></i>الحاضنات
+                    </button>
+                    <button class="btn btn-outline-warning" onclick="filterPrograms('accelerator')">
+                        <i class="fas fa-rocket me-2"></i>المسرعات
+                    </button>
+                    <button class="btn btn-outline-info" onclick="filterPrograms('grant')">
+                        <i class="fas fa-gift me-2"></i>المنح
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4 text-end">
+                <select class="form-select" id="cityFilter" onchange="filterByCity()">
+                    <option value="">جميع المدن</option>
+                    <option value="بغداد">بغداد</option>
+                    <option value="أربيل">أربيل</option>
+                    <option value="البصرة">البصرة</option>
+                    <option value="النجف">النجف</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Programs Grid -->
+<section class="py-5">
+    <div class="container">
+        <div class="row" id="programsContainer">
+            {% for program in programs %}
+            <div class="col-lg-6 col-xl-4 mb-4 program-item" data-type="{{ program.type }}" data-city="{{ program.city }}">
+                <div class="card program-card h-100">
+                    <div class="card-header program-header">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="program-type">
+                                {% if program.type == 'incubator' %}
+                                    <span class="badge bg-success"><i class="fas fa-seedling me-1"></i>حاضنة</span>
+                                {% elif program.type == 'accelerator' %}
+                                    <span class="badge bg-warning"><i class="fas fa-rocket me-1"></i>مسرع</span>
+                                {% else %}
+                                    <span class="badge bg-info"><i class="fas fa-gift me-1"></i>منحة</span>
+                                {% endif %}
+                            </div>
+                            <div class="program-status">
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-circle text-success me-1" style="font-size: 0.5rem;"></i>
+                                    مفتوح للتقديم
+                                </span>
+                            </div>
+                        </div>
+                        <h4 class="mt-3 mb-2">{{ program.name }}</h4>
+                        <p class="text-muted mb-0">{{ program.cohort_code }}</p>
+                    </div>
+                    
+                    <div class="card-body d-flex flex-column">
+                        <p class="program-description flex-grow-1">{{ program.description }}</p>
+                        
+                        <div class="program-details mb-4">
+                            <div class="detail-row mb-2">
+                                <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                <span>{{ program.city or 'متعددة المدن' }}</span>
+                            </div>
+                            {% if program.start_date %}
+                            <div class="detail-row mb-2">
+                                <i class="fas fa-calendar text-success me-2"></i>
+                                <span>يبدأ: {{ program.start_date.strftime('%d/%m/%Y') }}</span>
+                            </div>
+                            {% endif %}
+                            <div class="detail-row mb-2">
+                                <i class="fas fa-clock text-info me-2"></i>
+                                <span>
+                                    {% if program.type == 'incubator' %}6-12 شهر
+                                    {% elif program.type == 'accelerator' %}3-6 أشهر
+                                    {% else %}متغيرة{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="program-benefits mb-4">
+                            <h6 class="fw-bold mb-2">المزايا المتضمنة:</h6>
+                            <div class="benefits-list">
+                                <div class="benefit-item">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <span>تدريب متخصص</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <span>إرشاد من خبراء</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <span>شبكة تواصل</span>
+                                </div>
+                                {% if program.type != 'grant' %}
+                                <div class="benefit-item">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <span>فرص تمويل</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="program-actions mt-auto">
+                            {% if current_user.is_authenticated and current_user.role == 'Founder' %}
+                                <a href="{{ url_for('dashboard.apply_program', program_id=program.id) }}" class="btn btn-primary w-100 mb-2">
+                                    <i class="fas fa-paper-plane me-2"></i>قدم الآن
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('auth.register') }}" class="btn btn-primary w-100 mb-2">
+                                    <i class="fas fa-user-plus me-2"></i>سجل للتقديم
+                                </a>
+                            {% endif %}
+                            <button class="btn btn-outline-secondary w-100" onclick="showProgramDetails('{{ program.id }}')">
+                                <i class="fas fa-info-circle me-2"></i>تفاصيل أكثر
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- Demo Programs if no real programs -->
+            {% if not programs %}
+            <div class="col-lg-6 col-xl-4 mb-4 program-item" data-type="incubator" data-city="بغداد">
+                <div class="card program-card h-100">
+                    <div class="card-header program-header">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="program-type">
+                                <span class="badge bg-success"><i class="fas fa-seedling me-1"></i>حاضنة</span>
+                            </div>
+                            <div class="program-status">
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-circle text-success me-1" style="font-size: 0.5rem;"></i>
+                                    مفتوح للتقديم
+                                </span>
+                            </div>
+                        </div>
+                        <h4 class="mt-3 mb-2">برنامج نواتك الأساسي</h4>
+                        <p class="text-muted mb-0">RFDN-2024-01</p>
+                    </div>
+                    
+                    <div class="card-body d-flex flex-column">
+                        <p class="program-description flex-grow-1">برنامج شامل لدعم الشركات الناشئة من مرحلة الفكرة إلى النمو والتوسع في السوق العراقي.</p>
+                        
+                        <div class="program-details mb-4">
+                            <div class="detail-row mb-2">
+                                <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                <span>بغداد</span>
+                            </div>
+                            <div class="detail-row mb-2">
+                                <i class="fas fa-calendar text-success me-2"></i>
+                                <span>يبدأ: 01/01/2025</span>
+                            </div>
+                            <div class="detail-row mb-2">
+                                <i class="fas fa-clock text-info me-2"></i>
+                                <span>6-12 شهر</span>
+                            </div>
+                        </div>
+                        
+                        <div class="program-benefits mb-4">
+                            <h6 class="fw-bold mb-2">المزايا المتضمنة:</h6>
+                            <div class="benefits-list">
+                                <div class="benefit-item">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <span>تدريب متخصص</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <span>إرشاد من خبراء</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <span>شبكة تواصل</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <span>فرص تمويل</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="program-actions mt-auto">
+                            {% if current_user.is_authenticated and current_user.role == 'Founder' %}
+                                <a href="#" class="btn btn-primary w-100 mb-2">
+                                    <i class="fas fa-paper-plane me-2"></i>قدم الآن
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('auth.register') }}" class="btn btn-primary w-100 mb-2">
+                                    <i class="fas fa-user-plus me-2"></i>سجل للتقديم
+                                </a>
+                            {% endif %}
+                            <button class="btn btn-outline-secondary w-100" onclick="showProgramDetails('1')">
+                                <i class="fas fa-info-circle me-2"></i>تفاصيل أكثر
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- No Results Message -->
+        <div id="noResults" class="text-center py-5" style="display: none;">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">لم نجد برامج تطابق البحث</h5>
+            <p class="text-muted">جرب تغيير المرشحات أو تصفح جميع البرامج</p>
+        </div>
+    </div>
+</section>
+
+<!-- Program Details Modal -->
+<div class="modal fade" id="programDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">تفاصيل البرنامج</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="program-detail-content">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h4 class="fw-bold text-primary mb-3">برنامج نواتك الأساسي</h4>
+                            <p class="mb-4">برنامج شامل مدته 9 أشهر يهدف إلى دعم الشركات الناشئة في مراحلها المبكرة. يتضمن البرنامج تدريبات متخصصة، إرشاد فردي، وفرص تمويل.</p>
+                            
+                            <h6 class="fw-bold mb-3">مراحل البرنامج:</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size: 0.5rem;"></i> المرحلة الأولى: تطوير الفكرة (3 أشهر)</li>
+                                <li class="mb-2"><i class="fas fa-circle text-success me-2" style="font-size: 0.5rem;"></i> المرحلة الثانية: بناء النموذج الأولي (3 أشهر)</li>
+                                <li class="mb-2"><i class="fas fa-circle text-warning me-2" style="font-size: 0.5rem;"></i> المرحلة الثالثة: الطرح في السوق (3 أشهر)</li>
+                            </ul>
+                            
+                            <h6 class="fw-bold mb-3">المتطلبات:</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i> فكرة مبتكرة قابلة للتطوير</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i> فريق ملتزم (2-5 أشخاص)</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i> خطة عمل أولية</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i> التفرغ الجزئي أو الكامل</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="program-info-card p-4 bg-light rounded">
+                                <h6 class="fw-bold mb-3">معلومات سريعة</h6>
+                                <div class="info-item mb-3">
+                                    <strong>النوع:</strong> حاضنة أعمال
+                                </div>
+                                <div class="info-item mb-3">
+                                    <strong>المدة:</strong> 9 أشهر
+                                </div>
+                                <div class="info-item mb-3">
+                                    <strong>المدينة:</strong> بغداد
+                                </div>
+                                <div class="info-item mb-3">
+                                    <strong>رمز الدفعة:</strong> RFDN-2024-01
+                                </div>
+                                <div class="info-item mb-3">
+                                    <strong>تاريخ البدء:</strong> 01/01/2025
+                                </div>
+                                <div class="info-item mb-3">
+                                    <strong>آخر موعد للتقديم:</strong> 15/12/2024
+                                </div>
+                                
+                                <div class="funding-info mt-4 p-3 bg-white rounded">
+                                    <h6 class="fw-bold text-success mb-2">
+                                        <i class="fas fa-dollar-sign me-1"></i>
+                                        فرص التمويل
+                                    </h6>
+                                    <small class="text-muted">حتى 50,000 دولار للمشاريع المتميزة</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                {% if current_user.is_authenticated and current_user.role == 'Founder' %}
+                    <a href="#" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-2"></i>قدم الآن
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary">
+                        <i class="fas fa-user-plus me-2"></i>سجل للتقديم
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.program-card {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.program-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--primary);
+    box-shadow: var(--shadow-4);
+}
+
+.program-header {
+    background: var(--gradient-surface);
+    border-bottom: 1px solid rgba(26, 35, 126, 0.1);
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.benefit-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.filters .btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.program-item {
+    transition: all 0.3s ease;
+}
+
+.program-item.hidden {
+    display: none;
+}
+
+.info-item {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.funding-info {
+    border: 2px solid #28a745;
+}
+</style>
+
+<script>
+function filterPrograms(type) {
+    const items = document.querySelectorAll('.program-item');
+    const buttons = document.querySelectorAll('.filters .btn');
+    const noResults = document.getElementById('noResults');
+    
+    // Update active button
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    let visibleCount = 0;
+    
+    items.forEach(item => {
+        if (type === 'all' || item.dataset.type === type) {
+            item.classList.remove('hidden');
+            visibleCount++;
+        } else {
+            item.classList.add('hidden');
+        }
+    });
+    
+    noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+}
+
+function filterByCity() {
+    const cityFilter = document.getElementById('cityFilter').value;
+    const items = document.querySelectorAll('.program-item');
+    const noResults = document.getElementById('noResults');
+    
+    let visibleCount = 0;
+    
+    items.forEach(item => {
+        if (!cityFilter || item.dataset.city === cityFilter) {
+            item.classList.remove('hidden');
+            visibleCount++;
+        } else {
+            item.classList.add('hidden');
+        }
+    });
+    
+    noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+}
+
+function showProgramDetails(programId) {
+    const modal = new bootstrap.Modal(document.getElementById('programDetailsModal'));
+    modal.show();
+}
+
+// Add scroll animations
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+        }
+    });
+});
+
+document.querySelectorAll('.program-card').forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'all 0.6s ease';
+    observer.observe(card);
+});
+</script>
+{% endblock %}

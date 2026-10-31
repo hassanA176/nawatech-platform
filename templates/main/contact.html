@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+
+{% block title %}تواصل معنا - نواتك{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <div class="hero-content">
+                    <h1 class="display-4 fw-bold mb-4">تواصل معنا</h1>
+                    <p class="lead mb-0">نحن هنا لمساعدتك في رحلتك الريادية</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Contact Form -->
+            <div class="col-lg-8 mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-envelope me-2"></i>
+                            أرسل لنا رسالة
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="contactForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="firstName">الاسم الأول *</label>
+                                    <input type="text" class="form-control" id="firstName" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="lastName">الاسم الأخير *</label>
+                                    <input type="text" class="form-control" id="lastName" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="email">البريد الإلكتروني *</label>
+                                    <input type="email" class="form-control" id="email" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="phone">رقم الهاتف</label>
+                                    <input type="tel" class="form-control" id="phone">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label" for="subject">الموضوع *</label>
+                                <select class="form-select" id="subject" required>
+                                    <option value="">اختر الموضوع</option>
+                                    <option value="program_inquiry">استفسار عن البرامج</option>
+                                    <option value="partnership">شراكة</option>
+                                    <option value="media">استفسارات إعلامية</option>
+                                    <option value="support">دعم تقني</option>
+                                    <option value="feedback">ملاحظات</option>
+                                    <option value="other">أخرى</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label" for="message">الرسالة *</label>
+                                <textarea class="form-control" id="message" rows="5" 
+                                          placeholder="اكتب رسالتك هنا..." required></textarea>
+                            </div>
+                            
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" id="newsletter">
+                                <label class="form-check-label" for="newsletter">
+                                    أرغب في تلقي النشرة الإخبارية والتحديثات
+                                </label>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>إرسال الرسالة
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Info -->
+            <div class="col-lg-4">
+                <div class="contact-info">
+                    <!-- Office Info -->
+                    <div class="card mb-4">
+                        <div class="card-body text-center">
+                            <div class="contact-icon mb-3">
+                                <i class="fas fa-building fa-3x text-primary"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">مكتبنا الرئيسي</h5>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                بغداد - المنطقة الخضراء<br>
+                                شارع الرشيد - مجمع الأعمال
+                            </p>
+                            <p class="text-muted">
+                                <i class="fas fa-clock me-2"></i>
+                                الأحد - الخميس: 9:00 ص - 5:00 م
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Details -->
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 border-top border-primary border-4">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-4 text-center text-primary">معلومات الاتصال المباشر</h5>
+                            
+                            <!-- 1. البريد الإلكتروني -->
+                            <div class="contact-item mb-4 pb-3 border-bottom">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
+                                        <i class="fas fa-envelope text-primary fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <strong class="d-block text-dark mb-1">البريد الإلكتروني</strong>
+                                        <a href="mailto:info@nawatech.org" class="text-decoration-none fw-bold text-dark fs-5 hover-text-primary">
+                                            info@nawatech.org
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 2. الواتساب المدمج (ماليزيا + العراق) بالأعلام الثابتة -->
+                            <div class="contact-item mb-2">
+                                <div class="d-flex align-items-start">
+                                    <div class="bg-success p-3 rounded-circle me-3 shadow-sm">
+                                        <i class="fab fa-whatsapp text-white fa-xl"></i>
+                                    </div>
+                                    <div class="w-100">
+                                        <strong class="d-block text-dark mb-3 mt-1">تواصل معنا </strong>
+                                        
+                                        <!-- زر ماليزيا -->
+                                        <a href="https://wa.me/601128583170" target="_blank" class="text-decoration-none w-100 mb-3 d-flex justify-content-between align-items-center p-3 bg-white rounded-3 border shadow-sm hover-wa-card">
+                                            <div class="d-flex align-items-center" dir="ltr">
+                                                <!-- تم إصلاح الصورة وتثبيت أبعادها لمنع الانهيار -->
+                                                <img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/my.svg" alt="MY" style="width: 28px; height: 20px; object-fit: cover; border-radius: 3px; border: 1px solid #ddd;" class="me-3">
+                                                <span class="text-success fw-bold" style="font-size: 1.1rem; letter-spacing: 0.5px;">11 2858 3170</span>
+                                            </div>
+                                            <i class="fab fa-whatsapp text-success fs-4"></i>
+                                        </a>
+
+                                        <!-- زر العراق -->
+                                        <a href="https://wa.me/9647751812753" target="_blank" class="text-decoration-none w-100 d-flex justify-content-between align-items-center p-3 bg-white rounded-3 border shadow-sm hover-wa-card">
+                                            <div class="d-flex align-items-center" dir="ltr">
+                                                <!-- تم إصلاح الصورة وتثبيت أبعادها لمنع الانهيار -->
+                                                <img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/iq.svg" alt="IQ" style="width: 28px; height: 20px; object-fit: cover; border-radius: 3px; border: 1px solid #ddd;" class="me-3">
+                                                <span class="text-success fw-bold" style="font-size: 1.1rem; letter-spacing: 0.5px;">775 181 2753</span>
+                                            </div>
+                                            <i class="fab fa-whatsapp text-success fs-4"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- هذا الـ CSS مخصص فقط لتأثيرات الأزرار أعلاه -->
+                    <style>
+                        .hover-text-primary { transition: color 0.3s ease; }
+                        .hover-text-primary:hover { color: var(--primary) !important; }
+                        
+                        .hover-wa-card { transition: all 0.3s ease; }
+                        .hover-wa-card:hover { 
+                            background-color: #d1e7dd !important; 
+                            border-color: #198754 !important; 
+                            transform: translateX(-5px); 
+                        }
+                    </style>
+                    
+                    <!-- Social Media -->
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="fw-bold mb-4">تابعنا على</h5>
+                            <div class="social-links">
+                                <a href="#" class="btn btn-outline-primary btn-lg me-2 mb-2">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-info btn-lg me-2 mb-2">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-primary btn-lg me-2 mb-2">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-danger btn-lg mb-2">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-primary mb-3">الأسئلة الشائعة</h2>
+            <p class="lead text-muted">إجابات على أكثر الأسئلة تكراراً</p>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq1">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#collapse1">
+                                ما هي شروط القبول في البرامج؟
+                            </button>
+                        </h2>
+                        <div id="collapse1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                نقبل الشركات الناشئة في مراحل مختلفة، من الفكرة إلى النمو المبكر. الشروط الأساسية تشمل:
+                                وجود فريق متفاني، فكرة مبتكرة قابلة للتطوير، والالتزام بالبرنامج.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#collapse2">
+                                كم تستغرق مدة البرامج؟
+                            </button>
+                        </h2>
+                        <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                تختلف مدة البرامج حسب النوع: برامج الحاضنة تستغرق 6-12 شهر، المسرعات 3-6 أشهر، 
+                                والمنح قد تكون لفترات أقصر أو مفتوحة.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#collapse3">
+                                هل تقدمون تمويلاً للشركات؟
+                            </button>
+                        </h2>
+                        <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                نعم، نقدم فرص تمويل متنوعة من خلال شراكاتنا مع مستثمرين وصناديق استثمار. 
+                                كما نساعد في ربط الشركات بمصادر تمويل خارجية.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq4">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#collapse4">
+                                هل يمكن التقديم عن بُعد؟
+                            </button>
+                        </h2>
+                        <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                نعم، نقبل الطلبات عن بُعد ونوفر جلسات تدريبية واستشارية أونلاين. 
+                                لكن بعض الأنشطة تتطلب الحضور الشخصي حسب طبيعة البرنامج.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.contact-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.contact-item:last-child {
+    border-bottom: none;
+}
+
+.contact-item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(26, 35, 126, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.social-links .btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.accordion-button {
+    font-weight: 600;
+    text-align: right;
+}
+
+.accordion-button:not(.collapsed) {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+.contact-icon {
+    opacity: 0.8;
+}
+</style>
+
+<script>
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الإرسال...';
+    submitBtn.disabled = true;
+    
+    setTimeout(() => {
+        alert('تم إرسال رسالتك بنجاح! 📧\nسنتواصل معك قريباً.');
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        e.target.reset();
+    }, 2000);
+});
+</script>
+{% endblock %}

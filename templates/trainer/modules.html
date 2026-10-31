@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}الوحدات التدريبية - حاضنة الرافدين{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Trainer Sidebar -->
+        <div class="col-xl-2 col-lg-3">
+            <div class="sidebar">
+                <div class="sidebar-header mb-4">
+                    <h5 class="fw-bold text-primary mb-0">
+                        <i class="fas fa-chalkboard-teacher me-2"></i>
+                        لوحة المدرب
+                    </h5>
+                </div>
+                
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{{ url_for('trainer.dashboard') }}">
+                        <i class="fas fa-chart-pie me-2"></i>نظرة عامة
+                    </a>
+                    <a class="nav-link active" href="{{ url_for('trainer.modules') }}">
+                        <i class="fas fa-book me-2"></i>الوحدات التدريبية
+                    </a>
+                    <a class="nav-link" href="{{ url_for('trainer.review_ready') }}">
+                        <i class="fas fa-clipboard-check me-2"></i>مراجعة الشركات
+                    </a>
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-users me-2"></i>المتدربين
+                    </a>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-xl-10 col-lg-9">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold">
+                    <i class="fas fa-book me-2"></i>
+                    الوحدات التدريبية
+                </h4>
+                <button class="btn btn-primary" onclick="showAddModuleModal()">
+                    <i class="fas fa-plus me-2"></i>إضافة وحدة جديدة
+                </button>
+            </div>
+            
+            <!-- Modules Grid -->
+            <div class="row">
+                {% if modules %}
+                    {% for module in modules %}
+                    <div class="col-lg-6 col-xl-4 mb-4">
+                        <div class="card module-card h-100">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="fw-bold mb-1">{{ module.title }}</h6>
+                                        <small class="text-muted">{{ module.code }}</small>
+                                    </div>
+                                    <span class="badge bg-{{ 'success' if module.is_active else 'secondary' }}">
+                                        {{ 'نشط' if module.is_active else 'غير نشط' }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <div class="module-details mb-3">
+                                    <div class="detail-item mb-2">
+                                        <i class="fas fa-tag text-primary me-2"></i>
+                                        <span class="badge bg-primary">{{ module.sector }}</span>
+                                    </div>
+                                    <div class="detail-item mb-2">
+                                        <i class="fas fa-signal text-info me-2"></i>
+                                        <span>{{ 'أساسي' if module.level == 'basic' else 'متوسط' if module.level == 'intermediate' else 'متقدم' }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="module-actions mt-auto">
+                                    <div class="btn-group w-100">
+                                        <button class="btn btn-outline-primary btn-sm" onclick="editModule('{{ module.id }}')">
+                                            <i class="fas fa-edit"></i> تعديل
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm" onclick="viewModule('{{ module.id }}')">
+                                            <i class="fas fa-eye"></i> عرض
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm" onclick="toggleModule('{{ module.id }}')">
+                                            <i class="fas fa-toggle-{{ 'on' if module.is_active else 'off' }}"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <!-- Demo Modules -->
+                    <div class="col-lg-6 col-xl-4 mb-4">
+                        <div class="card module-card h-100">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="fw-bold mb-1">نمذجة نموذج العمل التجاري</h6>
+                                        <small class="text-muted">GE-101</small>
+                                    </div>
+                                    <span class="badge bg-success">نشط</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <div class="module-details mb-3">
+                                    <div class="detail-item mb-2">
+                                        <i class="fas fa-tag text-primary me-2"></i>
+                                        <span class="badge bg-primary">عام</span>
+                                    </div>
+                                    <div class="detail-item mb-2">
+                                        <i class="fas fa-signal text-info me-2"></i>
+                                        <span>أساسي</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="module-actions mt-auto">
+                                    <div class="btn-group w-100">
+                                        <button class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-edit"></i> تعديل
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm">
+                                            <i class="fas fa-eye"></i> عرض
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-toggle-on"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6 col-xl-4 mb-4">
+                        <div class="card module-card h-100">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="fw-bold mb-1">أساسيات التكنولوجيا المالية</h6>
+                                        <small class="text-muted">FT-101</small>
+                                    </div>
+                                    <span class="badge bg-success">نشط</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <div class="module-details mb-3">
+                                    <div class="detail-item mb-2">
+                                        <i class="fas fa-tag text-primary me-2"></i>
+                                        <span class="badge bg-warning">التكنولوجيا المالية</span>
+                                    </div>
+                                    <div class="detail-item mb-2">
+                                        <i class="fas fa-signal text-info me-2"></i>
+                                        <span>أساسي</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="module-actions mt-auto">
+                                    <div class="btn-group w-100">
+                                        <button class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-edit"></i> تعديل
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm">
+                                            <i class="fas fa-eye"></i> عرض
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-toggle-on"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Empty State -->
+            {% if not modules %}
+            <div class="text-center py-5">
+                <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">لا توجد وحدات تدريبية</h5>
+                <p class="text-muted">ابدأ بإضافة أول وحدة تدريبية</p>
+                <button class="btn btn-primary" onclick="showAddModuleModal()">
+                    <i class="fas fa-plus me-2"></i>إضافة وحدة جديدة
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.module-card {
+    transition: all 0.3s ease;
+}
+
+.module-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-3);
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+</style>
+
+<script>
+function showAddModuleModal() {
+    alert('فتح نموذج إضافة وحدة جديدة');
+}
+
+function editModule(id) {
+    alert(`تعديل الوحدة رقم ${id}`);
+}
+
+function viewModule(id) {
+    alert(`عرض الوحدة رقم ${id}`);
+}
+
+function toggleModule(id) {
+    alert(`تغيير حالة الوحدة رقم ${id}`);
+}
+</script>
+{% endblock %}

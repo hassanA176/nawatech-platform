@@ -1,0 +1,619 @@
+{% extends "base.html" %}
+
+{% block title %}التقارير والإحصائيات - نواتك{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Admin Sidebar -->
+        <div class="col-xl-2 col-lg-3">
+            <div class="sidebar">
+                <div class="sidebar-header mb-4">
+                    <h5 class="fw-bold text-primary mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        التقارير
+                    </h5>
+                </div>
+                
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="#overview">
+                        <i class="fas fa-chart-pie me-2"></i>نظرة عامة
+                    </a>
+                    <a class="nav-link" href="#users-report">
+                        <i class="fas fa-users me-2"></i>تقرير المستخدمين
+                    </a>
+                    <a class="nav-link" href="#programs-report">
+                        <i class="fas fa-graduation-cap me-2"></i>تقرير البرامج
+                    </a>
+                    <a class="nav-link" href="#startups-report">
+                        <i class="fas fa-building me-2"></i>تقرير الشركات
+                    </a>
+                    <a class="nav-link" href="#financial-report">
+                        <i class="fas fa-dollar-sign me-2"></i>التقرير المالي
+                    </a>
+                </nav>
+                
+                <div class="mt-4">
+                    <h6 class="fw-bold mb-3">تصدير التقارير</h6>
+                    <button class="btn btn-outline-primary btn-sm w-100 mb-2" onclick="exportReport('pdf')">
+                        <i class="fas fa-file-pdf me-1"></i>PDF
+                    </button>
+                    <button class="btn btn-outline-success btn-sm w-100 mb-2" onclick="exportReport('excel')">
+                        <i class="fas fa-file-excel me-1"></i>Excel
+                    </button>
+                    <button class="btn btn-outline-info btn-sm w-100" onclick="exportReport('csv')">
+                        <i class="fas fa-file-csv me-1"></i>CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-xl-10 col-lg-9">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    التقارير والإحصائيات
+                </h4>
+                <div class="btn-group">
+                    <select class="form-select" id="dateRange" onchange="updateDateRange()">
+                        <option value="week">آخر أسبوع</option>
+                        <option value="month" selected>آخر شهر</option>
+                        <option value="quarter">آخر 3 أشهر</option>
+                        <option value="year">آخر سنة</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Overview Stats -->
+            <div id="overview" class="report-section">
+                <div class="row mb-4">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stats-card text-center">
+                            <div class="stats-icon" style="background: var(--gradient-primary);">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3 class="fw-bold text-primary display-6 mb-1">147</h3>
+                            <p class="text-muted mb-2">إجمالي المستخدمين</p>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up me-1"></i>+12% هذا الشهر
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stats-card text-center">
+                            <div class="stats-icon" style="background: var(--gradient-secondary);">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <h3 class="fw-bold text-primary display-6 mb-1">89</h3>
+                            <p class="text-muted mb-2">الشركات الناشئة</p>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up me-1"></i>+8% هذا الشهر
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stats-card text-center">
+                            <div class="stats-icon" style="background: var(--gradient-accent);">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <h3 class="fw-bold text-primary display-6 mb-1">15</h3>
+                            <p class="text-muted mb-2">البرامج النشطة</p>
+                            <small class="text-warning">
+                                <i class="fas fa-minus me-1"></i>0% هذا الشهر
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stats-card text-center">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <h3 class="fw-bold text-primary display-6 mb-1">2.3M</h3>
+                            <p class="text-muted mb-2">التمويل المقدم ($)</p>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up me-1"></i>+25% هذا الشهر
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts Row -->
+                <div class="row mb-5">
+                    <div class="col-lg-8 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-chart-line me-2"></i>
+                                    نمو المستخدمين والشركات
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="growthChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-chart-pie me-2"></i>
+                                    توزيع المستخدمين
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="userDistributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Users Report -->
+            <div id="users-report" class="report-section" style="display: none;">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users me-2"></i>
+                            تقرير المستخدمين التفصيلي
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="metric-card text-center p-3 bg-primary-subtle rounded">
+                                    <h4 class="fw-bold text-primary">35</h4>
+                                    <p class="mb-0">رواد أعمال</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card text-center p-3 bg-success-subtle rounded">
+                                    <h4 class="fw-bold text-success">12</h4>
+                                    <p class="mb-0">مستشارين</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card text-center p-3 bg-info-subtle rounded">
+                                    <h4 class="fw-bold text-info">8</h4>
+                                    <p class="mb-0">مدربين</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card text-center p-3 bg-warning-subtle rounded">
+                                    <h4 class="fw-bold text-warning">3</h4>
+                                    <p class="mb-0">مدراء</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-lg-6 mb-4">
+                                <canvas id="userRolesChart"></canvas>
+                            </div>
+                            <div class="col-lg-6 mb-4">
+                                <canvas id="userRegistrationChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Programs Report -->
+            <div id="programs-report" class="report-section" style="display: none;">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-graduation-cap me-2"></i>
+                            تقرير البرامج والأداء
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="program-metric text-center p-4 border rounded">
+                                    <div class="metric-icon mb-3">
+                                        <i class="fas fa-seedling fa-2x text-success"></i>
+                                    </div>
+                                    <h4 class="fw-bold">8</h4>
+                                    <p class="text-muted mb-0">برامج الحاضنة</p>
+                                    <div class="progress mt-2">
+                                        <div class="progress-bar bg-success" style="width: 80%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="program-metric text-center p-4 border rounded">
+                                    <div class="metric-icon mb-3">
+                                        <i class="fas fa-rocket fa-2x text-warning"></i>
+                                    </div>
+                                    <h4 class="fw-bold">5</h4>
+                                    <p class="text-muted mb-0">برامج المسرعة</p>
+                                    <div class="progress mt-2">
+                                        <div class="progress-bar bg-warning" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="program-metric text-center p-4 border rounded">
+                                    <div class="metric-icon mb-3">
+                                        <i class="fas fa-gift fa-2x text-info"></i>
+                                    </div>
+                                    <h4 class="fw-bold">2</h4>
+                                    <p class="text-muted mb-0">برامج المنح</p>
+                                    <div class="progress mt-2">
+                                        <div class="progress-bar bg-info" style="width: 40%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <canvas id="programsPerformanceChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Startups Report -->
+            <div id="startups-report" class="report-section" style="display: none;">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-building me-2"></i>
+                            تقرير الشركات الناشئة
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-lg-6">
+                                <h6 class="fw-bold mb-3">توزيع الشركات حسب القطاع</h6>
+                                <canvas id="sectorDistributionChart"></canvas>
+                            </div>
+                            
+                            <div class="col-lg-6">
+                                <h6 class="fw-bold mb-3">توزيع الشركات حسب المرحلة</h6>
+                                <canvas id="stageDistributionChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="top-startups">
+                            <h6 class="fw-bold mb-3">أفضل الشركات الناشئة</h6>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>الشركة</th>
+                                            <th>القطاع</th>
+                                            <th>المرحلة</th>
+                                            <th>التقييم</th>
+                                            <th>التمويل</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar bg-primary text-white me-2" style="width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">ت</div>
+                                                    <span>تطبيق التوصيل الذكي</span>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-info">التكنولوجيا المالية</span></td>
+                                            <td><span class="badge bg-success">نمو مبكر</span></td>
+                                            <td>
+                                                <div class="rating">
+                                                    <i class="fas fa-star text-warning"></i>
+                                                    <i class="fas fa-star text-warning"></i>
+                                                    <i class="fas fa-star text-warning"></i>
+                                                    <i class="fas fa-star text-warning"></i>
+                                                    <i class="fas fa-star text-muted"></i>
+                                                </div>
+                                            </td>
+                                            <td>$250K</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar bg-secondary text-white me-2" style="width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">م</div>
+                                                    <span>منصة التعليم الذكي</span>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-warning">التكنولوجيا التعليمية</span></td>
+                                            <td><span class="badge bg-primary">نموذج أولي</span></td>
+                                            <td>
+                                                <div class="rating">
+                                                    <i class="fas fa-star text-warning"></i>
+                                                    <i class="fas fa-star text-warning"></i>
+                                                    <i class="fas fa-star text-warning"></i>
+                                                    <i class="fas fa-star text-warning"></i>
+                                                    <i class="fas fa-star text-warning"></i>
+                                                </div>
+                                            </td>
+                                            <td>$180K</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Financial Report -->
+            <div id="financial-report" class="report-section" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-dollar-sign me-2"></i>
+                            التقرير المالي
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-3 mb-3">
+                                <div class="financial-metric text-center p-3 bg-success-subtle rounded">
+                                    <h3 class="fw-bold text-success">$2.3M</h3>
+                                    <p class="mb-0">إجمالي التمويل</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="financial-metric text-center p-3 bg-primary-subtle rounded">
+                                    <h3 class="fw-bold text-primary">$85K</h3>
+                                    <p class="mb-0">متوسط التمويل</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="financial-metric text-center p-3 bg-warning-subtle rounded">
+                                    <h3 class="fw-bold text-warning">27</h3>
+                                    <p class="mb-0">شركات ممولة</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="financial-metric text-center p-3 bg-info-subtle rounded">
+                                    <h3 class="fw-bold text-info">73%</h3>
+                                    <p class="mb-0">معدل النجاح</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <canvas id="financialChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.report-section {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.metric-card, .program-metric, .financial-metric {
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover, .program-metric:hover, .financial-metric:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-3);
+}
+
+.rating .fas {
+    font-size: 0.9rem;
+}
+
+.sidebar .nav-link.active {
+    background: var(--gradient-primary);
+    color: white;
+}
+</style>
+
+<script>
+// Initialize Charts
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+});
+
+function initializeCharts() {
+    // Growth Chart
+    const growthCtx = document.getElementById('growthChart').getContext('2d');
+    new Chart(growthCtx, {
+        type: 'line',
+        data: {
+            labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+            datasets: [{
+                label: 'المستخدمين',
+                data: [12, 19, 25, 32, 38, 47],
+                borderColor: '#1a237e',
+                backgroundColor: 'rgba(26, 35, 126, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'الشركات الناشئة',
+                data: [5, 8, 12, 18, 25, 35],
+                borderColor: '#f50057',
+                backgroundColor: 'rgba(245, 0, 87, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // User Distribution Chart
+    const userDistCtx = document.getElementById('userDistributionChart').getContext('2d');
+    new Chart(userDistCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['رواد أعمال', 'مستشارين', 'مدربين', 'مدراء'],
+            datasets: [{
+                data: [35, 12, 8, 3],
+                backgroundColor: ['#1a237e', '#f50057', '#00e676', '#ff9800']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // User Roles Chart
+    const userRolesCtx = document.getElementById('userRolesChart').getContext('2d');
+    new Chart(userRolesCtx, {
+        type: 'bar',
+        data: {
+            labels: ['رواد أعمال', 'مستشارين', 'مدربين', 'مدراء'],
+            datasets: [{
+                label: 'عدد المستخدمين',
+                data: [35, 12, 8, 3],
+                backgroundColor: ['#1a237e', '#f50057', '#00e676', '#ff9800']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Additional charts...
+    initializeSectorChart();
+    initializeStageChart();
+    initializeFinancialChart();
+}
+
+function initializeSectorChart() {
+    const sectorCtx = document.getElementById('sectorDistributionChart').getContext('2d');
+    new Chart(sectorCtx, {
+        type: 'pie',
+        data: {
+            labels: ['التكنولوجيا المالية', 'التجارة الإلكترونية', 'التكنولوجيا الصحية', 'التعليم', 'أخرى'],
+            datasets: [{
+                data: [30, 25, 20, 15, 10],
+                backgroundColor: ['#1a237e', '#f50057', '#00e676', '#ff9800', '#2196f3']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+function initializeStageChart() {
+    const stageCtx = document.getElementById('stageDistributionChart').getContext('2d');
+    new Chart(stageCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['فكرة', 'نموذج أولي', 'نمو مبكر', 'توسع'],
+            datasets: [{
+                data: [15, 35, 30, 20],
+                backgroundColor: ['#ff9800', '#2196f3', '#4caf50', '#f44336']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+function initializeFinancialChart() {
+    const financialCtx = document.getElementById('financialChart').getContext('2d');
+    new Chart(financialCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+            datasets: [{
+                label: 'التمويل المقدم ($)',
+                data: [450000, 580000, 720000, 550000],
+                backgroundColor: '#4caf50'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Navigation between report sections
+document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Update active state
+        document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Show corresponding section
+        const target = this.getAttribute('href').substring(1);
+        document.querySelectorAll('.report-section').forEach(section => {
+            section.style.display = 'none';
+        });
+        document.getElementById(target).style.display = 'block';
+    });
+});
+
+function updateDateRange() {
+    const range = document.getElementById('dateRange').value;
+    // Simulate data update based on date range
+    console.log('Updating data for range:', range);
+    // Here you would typically fetch new data and update charts
+}
+
+function exportReport(format) {
+    alert(`تصدير التقرير بصيغة ${format.toUpperCase()} 📊`);
+    // Implement actual export functionality
+}
+</script>
+{% endblock %}

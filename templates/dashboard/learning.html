@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+{% block title %}منصة التعلم - {{ app.startup.name }}{% endblock %}
+{% block content %}
+
+<!-- عرض تنبيه إذا أرسل المدرب ملاحظات -->
+{% if app.trainer_feedback %}
+<div class="alert bg-success text-white rounded-0 mb-0 py-3 shadow-sm">
+    <div class="container d-flex align-items-center">
+        <i class="fas fa-envelope-open-text fa-2x me-3"></i>
+        <div>
+            <h5 class="fw-bold mb-1">رسالة جديدة من مدربك!</h5>
+            <p class="mb-0">{{ app.trainer_feedback }}</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="container-fluid bg-dark text-white py-4 mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h3 class="fw-bold mb-1 text-white"><i class="fas fa-graduation-cap text-warning me-2"></i> مسار التعلم والتطوير</h3>
+            <p class="mb-0 text-light">المشروع: {{ app.startup.name }} | المدرب: {{ app.trainer.full_name }}</p>
+        </div>
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-light fw-bold">العودة للوحة</a>
+    </div>
+</div>
+
+<div class="container-fluid px-4 mb-5">
+    <div class="row g-4">
+        <!-- القائمة الجانبية -->
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 20px;">
+                <!-- تم تغيير اللون ليصبح النص أسود والخلفية بيضاء كما طلبت -->
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-list me-2 text-primary"></i> محتويات المسار</h5>
+                </div>
+                <div class="list-group list-group-flush" id="lessonList">
+                    
+                    <div class="p-3 bg-light fw-bold text-dark border-bottom"><i class="fas fa-book-open me-2"></i> الكورس التحضيري</div>
+                    {% for lesson in prep_course %}
+                    <button type="button" class="list-group-item list-group-item-action p-3 d-flex align-items-center" onclick="loadPrepLesson('{{ lesson.id }}')">
+                        {% if lesson.id in completed_lessons %}
+                            <i class="fas fa-check-circle text-success me-3 fs-5" id="icon_{{ lesson.id }}"></i>
+                        {% else %}
+                            <i class="far fa-circle text-muted me-3 fs-5" id="icon_{{ lesson.id }}"></i>
+                        {% endif %}
+                        <span class="fw-bold text-dark">{{ lesson.title }}</span>
+                    </button>
+                    {% endfor %}
+
+                    <!-- كورسات المدرب -->
+                    {% if trainer_courses %}
+                    <div class="p-3 bg-light fw-bold text-dark border-bottom border-top mt-2"><i class="fas fa-chalkboard-teacher me-2"></i> كورسات المدرب</div>
+                        {% for t_course in trainer_courses %}
+                            <div class="p-2 text-muted small fw-bold bg-white text-center">{{ t_course.title }}</div>
+                            {% for t_lesson in t_course.lessons %}
+                            <button type="button" class="list-group-item list-group-item-action p-3 d-flex align-items-center" onclick="loadTrainerLesson('{{ t_course.id }}', '{{ t_lesson.id }}')">
+                                {% if t_lesson.id|string in completed_lessons %}
+                                    <i class="fas fa-check-circle text-success me-3 fs-5" id="icon_{{ t_lesson.id }}"></i>
+                                {% else %}
+                                    <i class="far fa-circle text-muted me-3 fs-5" id="icon_{{ t_lesson.id }}"></i>
+                                {% endif %}
+                                <span class="text-dark fw-bold">{{ t_lesson.title }}</span>
+                            </button>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endif %}
+
+                    <button type="button" class="list-group-item list-group-item-action p-4 text-center mt-3 border-top bg-warning bg-opacity-10" onclick="loadFinalProject()">
+                        <i class="fas fa-file-signature text-warning fa-2x mb-2 d-block"></i>
+                        <span class="fw-bold text-dark">مشروع التخرج النهائي</span>
+                        {% if app.final_project_submitted %}
+                            <span class="badge bg-success mt-2 d-block">تم التسليم</span>
+                        {% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- منطقة عرض المحتوى -->
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-sm rounded-4 min-vh-100">
+                <div class="card-body p-4 p-md-5" id="contentArea">
+                    <div class="text-center py-5 mt-5">
+                        <i class="fas fa-laptop-code fa-5x text-primary opacity-50 mb-4"></i>
+                        <h3 class="text-dark fw-bold">أهلاً بك في منصة التعلم</h3>
+                        <p class="text-muted fs-5">اختر درساً من القائمة للبدء.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const prepLessons = {{ prep_course | tojson }};
+    const trainerCourses = {{ trainer_courses | tojson }};
+    const appId = {{ app.id }};
+    const userName = "{{ current_user.full_name }}";
+    const todayDate = new Date().toLocaleDateString('ar-EG');
+    let currentLessonId = null;
+
+    // ===================================
+    // 1. نظام الكورس التحضيري واستمارة 1
+    // ===================================
+    function loadPrepLesson(lessonId) {
+        currentLessonId = lessonId;
+        const lesson = prepLessons.find(l => l.id === lessonId);
+        const area = document.getElementById('contentArea');
+        
+        area.innerHTML = `
+            <h3 class="fw-bold text-primary mb-4">${lesson.title}</h3>
+            <div class="ratio ratio-16x9 bg-dark rounded-4 overflow-hidden mb-4 shadow-sm">
+                <video controls crossorigin="anonymous">
+                    <source src="${lesson.video_url}" type="video/mp4">
+                    <track label="English" kind="subtitles" srclang="en" src="${lesson.subtitle_url}" default>
+                </video>
+            </div>
+            <div class="bg-light p-4 rounded-4 mb-4"><p class="fs-5 text-dark mb-0">${lesson.content}</p></div>
+            
+            <div class="card border-primary border-2 shadow-sm rounded-4 mb-4" id="quizSection">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-primary mb-3">اختبار إتمام الدرس:</h5>
+                    <p class="fw-bold fs-5 text-dark">${lesson.quiz.question}</p>
+                    <div class="d-grid gap-2">
+                        ${lesson.quiz.options.map((opt, index) => `
+                            <button class="btn btn-outline-dark text-start p-3 fs-5 fw-bold" onclick="checkAnswer(${index}, ${lesson.quiz.correct})">${opt}</button>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+            <div id="formOneSection" style="display:none;"></div>
+            <div id="successMessage" class="alert alert-success fw-bold text-center fs-5" style="display:none;">
+                <i class="fas fa-check-circle fa-2x mb-2 d-block"></i> أحسنت! تم إنجاز الدرس.
+            </div>
+        `;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function checkAnswer(selectedIndex, correctIndex) {
+        if(selectedIndex === correctIndex) {
+            document.getElementById('quizSection').style.display = 'none';
+            document.getElementById('icon_' + currentLessonId).className = 'fas fa-check-circle text-success me-3 fs-5';
+            
+            fetch("{{ url_for('dashboard.mark_lesson_complete') }}", {
+                method: "POST", headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({app_id: appId, lesson_id: currentLessonId})
+            });
+
+            if(currentLessonId === 'prep_1') {
+                showFormOne();
+            } else {
+                document.getElementById('successMessage').style.display = 'block';
+            }
+        } else {
+            alert('إجابة خاطئة، نرجو التركيز والمحاولة مجدداً.');
+        }
+    }
+
+    function showFormOne() {
+        const formDiv = document.getElementById('formOneSection');
+        formDiv.style.display = 'block';
+        formDiv.innerHTML = `
+            <div class="card border-dark shadow-lg rounded-0 mb-4">
+                <div class="card-header bg-white border-dark text-end p-2">
+                    <span class="border border-dark px-4 py-1 fw-bold text-dark">استمارة 1</span>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-bordered border-dark mb-0">
+                        <tr>
+                            <td class="bg-white text-center w-25 text-dark"><strong>التاريخ:</strong><br>${todayDate}</td>
+                            <td class="bg-white text-end w-50"></td>
+                            <td class="bg-white text-end w-25 text-dark"><strong>الاسم:</strong><br>${userName}</td>
+                            <td class="bg-white text-center w-25"><h3 class="fw-bold mb-0 text-dark">فكرة المشروع</h3></td>
+                        </tr>
+                        <tr><td colspan="4" class="bg-light text-end fw-bold text-dark">إحتياجات الزبون التي ستُغطى من قِبل المشروع (ماذا و أين و لمن؟)</td></tr>
+                        <tr><td colspan="4" class="p-0"><textarea id="customerNeeds" class="form-control border-0 rounded-0" rows="6" dir="rtl" style="text-align: right !important direction: rtl !important  ; placeholder="اكتب هنا..."></textarea></td></tr>
+                        <tr><td colspan="4" class="bg-light text-end fw-bold text-dark">الهدف الاسمى الذي يشجع على تطوير فكرة المشروع ؟</td></tr>
+                        <tr><td colspan="4" class="p-0"><textarea id="ultimateGoal" class="form-control border-0 rounded-0" rows="6"dir="rtl" style="text-align: right; placeholder="اكتب هنا..."></textarea></td></tr>
+                    </table>
+                </div>
+                <div class="card-footer bg-white border-0 text-center p-4">
+                    <button class="btn btn-primary btn-lg fw-bold px-5" onclick="submitFormOne()"><i class="fas fa-paper-plane me-2"></i> حفظ الاستمارة وإرسالها للمدرب</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function submitFormOne() {
+        const needs = document.getElementById('customerNeeds').value;
+        const goal = document.getElementById('ultimateGoal').value;
+        if(!needs || !goal) { alert('الرجاء تعبئة جميع حقول الاستمارة'); return; }
+        
+        fetch("{{ url_for('dashboard.submit_form_one') }}", {
+            method: "POST", headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({app_id: appId, customer_needs: needs, ultimate_goal: goal})
+        }).then(() => {
+            document.getElementById('formOneSection').innerHTML = `<div class="alert alert-success fw-bold text-center fs-5"><i class="fas fa-check-circle fa-2x mb-2 d-block"></i> تم استلام الاستمارة بنجاح! يمكنك الانتقال للدرس التالي.</div>`;
+        });
+    }
+
+    // ===================================
+    // 2. نظام تشغيل كورسات المدرب
+    // ===================================
+    function loadTrainerLesson(courseId, lessonId) {
+        currentLessonId = lessonId;
+        const course = trainerCourses.find(c => c.id == courseId);
+        const lesson = course.lessons.find(l => l.id == lessonId);
+        const area = document.getElementById('contentArea');
+        
+        let html = `<h3 class="fw-bold text-primary mb-4">${lesson.title}</h3>`;
+        
+        if(lesson.video) {
+            html += `<div class="ratio ratio-16x9 bg-dark rounded-4 overflow-hidden mb-4 shadow-sm"><video controls><source src="/static/${lesson.video}" type="video/mp4"></video></div>`;
+        }
+        if(lesson.text) {
+            html += `<div class="bg-light p-4 rounded-4 mb-4 lh-lg fs-5 text-dark">${lesson.text}</div>`;
+        }
+        if(lesson.pdf) {
+            html += `<a href="/static/${lesson.pdf}" target="_blank" class="btn btn-danger fw-bold mb-4"><i class="fas fa-file-pdf me-2"></i> تحميل وقراءة الملف المرفق</a>`;
+        }
+        
+        html += `
+            <hr>
+            <div class="text-center mt-4">
+                <button class="btn btn-success btn-lg fw-bold px-5" onclick="markTrainerLessonDone()">
+                    <i class="fas fa-check-circle me-2"></i> أتممت هذا الدرس بنجاح
+                </button>
+            </div>
+        `;
+        area.innerHTML = html;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function markTrainerLessonDone() {
+        document.getElementById('icon_' + currentLessonId).className = 'fas fa-check-circle text-success me-3 fs-5';
+        fetch("{{ url_for('dashboard.mark_lesson_complete') }}", {
+            method: "POST", headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({app_id: appId, lesson_id: currentLessonId})
+        }).then(() => alert("تم تسجيل تقدمك للمدرب!"));
+    }
+
+    // ===================================
+    // 3. الدالة المفقودة (مشروع التخرج) + إصلاح الألوان وفتح المحرر
+    // ===================================
+    function loadFinalProject() {
+        const area = document.getElementById('contentArea');
+        area.innerHTML = `
+            <h3 class="fw-bold text-warning mb-4"><i class="fas fa-flag-checkered me-2"></i> مشروع التخرج النهائي</h3>
+            
+            <div class="row">
+                <div class="col-xl-7 mb-4">
+                    <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+                        <!-- تم تغيير اللون إلى نص أسود واضح -->
+                        <div class="card-header bg-light border-bottom py-3">
+                            <h5 class="text-dark fw-bold mb-0"><i class="fas fa-file-pdf text-danger me-2"></i> مستند التدريب (15 صفحة)</h5>
+                        </div>
+                        <div class="card-body p-0" style="height: 600px;">
+                            <iframe src="/dashboard/media/pdf/train.pdf" width="100%" height="100%" style="border:none;"></iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-5 mb-4">
+                    <div class="card border-warning border-2 shadow-sm rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold text-dark mb-3">تسليم المشروع للمدرب:</h5>
+                            <p class="text-muted small mb-4">اختر طريقة التسليم التي تناسبك.</p>
+                            
+                            <a href="/dashboard/media/pdf/train.pdf" download class="btn btn-dark w-100 fw-bold mb-4 py-2">
+                                <i class="fas fa-download me-2"></i> تحميل الـ PDF
+                            </a>
+
+                            <!-- فورم رفع الملف -->
+                            <form action="{{ url_for('dashboard.submit_final_project', app_id=app.id) }}" method="POST" enctype="multipart/form-data" class="mb-4">
+                                <label class="fw-bold text-dark mb-2">الطريقة الأولى: رفع ملف</label>
+                                <input type="file" name="project_file" class="form-control mb-2" accept=".pdf,.doc,.docx,.pptx">
+                                <button type="submit" class="btn btn-warning w-100 fw-bold text-dark"><i class="fas fa-upload me-2"></i> إرسال الملف</button>
+                            </form>
+                            
+                            <hr>
+                            
+                            <!-- فورم المحرر الرقمي (تم إصلاح زر الفتح هنا) -->
+                            <label class="fw-bold text-dark mb-2">الطريقة الثانية: المحرر الرقمي المباشر</label>
+                            <button class="btn btn-outline-primary w-100 fw-bold py-2" onclick="const editor = document.getElementById('digitalEditor'); editor.style.display = editor.style.display === 'none' ? 'block' : 'none';">
+                                <i class="fas fa-keyboard me-2"></i> فتح المحرر لكتابة الإجابات
+                            </button>
+
+                            <form action="{{ url_for('dashboard.submit_final_project', app_id=app.id) }}" method="POST" id="digitalEditor" style="display:none;" class="mt-3">
+                                <textarea name="digital_editor_text" class="form-control mb-2" rows="10" placeholder="اكتب إجاباتك ومشروعك هنا ليقرأها المدرب..." required></textarea>
+                                <button type="submit" class="btn btn-success w-100 fw-bold"><i class="fas fa-paper-plane me-2"></i> إرسال الإجابات للمدرب</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+{% endblock %}
